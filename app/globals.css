@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #0a0a0a;
+  color: #f5f5f4;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.reveal-on-scroll {
+  opacity: 1;
+}
+
+@keyframes reveal-section {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    animation: reveal-section linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 30%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

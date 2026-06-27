@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.env*
+!.env.example
+
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+.DS_Store
+Thumbs.db
+
+# Large local media. GitHub rejects files over 100 MB.
+public/video.mp4
