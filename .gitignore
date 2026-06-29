@@ -19,6 +19,3 @@ next-env.d.ts
 
 .DS_Store
 Thumbs.db
-
-# Large local media. GitHub rejects files over 100 MB.
-public/video.mp4
