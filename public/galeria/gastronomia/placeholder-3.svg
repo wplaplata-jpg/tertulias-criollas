@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Placeholder gastronomia 3">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="1" y2="0">
+      <stop offset="0" stop-color="#050505"/>
+      <stop offset="0.5" stop-color="#21140f"/>
+      <stop offset="1" stop-color="#7a5637"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g)"/>
+  <path d="M470 190h110l-20 260c-6 80-64 80-70 0zM645 190h110l-20 260c-6 80-64 80-70 0z" fill="#f2ddbc" fill-opacity="0.12"/>
+  <path d="M520 520v110M700 520v110M455 630h130M635 630h130" stroke="#f2ddbc" stroke-opacity="0.2" stroke-width="10"/>
+</svg>

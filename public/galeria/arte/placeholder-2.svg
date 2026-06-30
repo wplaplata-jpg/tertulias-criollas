@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Placeholder arte 2">
+  <defs>
+    <linearGradient id="g" x1="1" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#4a382d"/>
+      <stop offset="0.52" stop-color="#111111"/>
+      <stop offset="1" stop-color="#000000"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g)"/>
+  <path d="M390 560c-70-160 20-330 210-360 180 35 270 195 210 360" fill="#f5dfbc" fill-opacity="0.12"/>
+  <path d="M500 590c30-190 140-300 300-360" stroke="#f5dfbc" stroke-opacity="0.18" stroke-width="12" fill="none"/>
+</svg>

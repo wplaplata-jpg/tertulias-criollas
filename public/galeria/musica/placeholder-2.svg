@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Placeholder musica 2">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="1" y2="0">
+      <stop offset="0" stop-color="#080808"/>
+      <stop offset="0.48" stop-color="#261b14"/>
+      <stop offset="1" stop-color="#7b6142"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g)"/>
+  <path d="M300 250h560M270 340h650M330 430h520" stroke="#f4e3c7" stroke-opacity="0.16" stroke-width="7"/>
+  <circle cx="430" cy="340" r="38" fill="#f4e3c7" fill-opacity="0.22"/>
+  <circle cx="715" cy="250" r="32" fill="#f4e3c7" fill-opacity="0.18"/>
+</svg>

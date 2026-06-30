@@ -11,6 +11,14 @@ const reservationFields = [
   { id: "residencia", label: "Residencia", type: "text", placeholder: "Ciudad o país" }
 ] as const;
 
+const eventDetails = [
+  ["Fecha", "Último sábado de cada mes"],
+  ["Horario", "18:00 a 22:00 hs"],
+  ["Lugar", "Casona La EnriSu"],
+  ["Modalidad", "Preventa por transferencia"],
+  ["Cupos", "Cupos disponibles: 25"]
+] as const;
+
 export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -44,7 +52,7 @@ export default function ReservationPage() {
       }
 
       setSuccessMessage(
-        "Solicitud recibida. Nos contactaremos por email para continuar con la preventa."
+        "Recibimos tu solicitud de reserva de preventa. Nos contactaremos por email para compartir las instrucciones de transferencia y continuar con la confirmación."
       );
       event.currentTarget.reset();
     } catch {
@@ -68,17 +76,51 @@ export default function ReservationPage() {
           <p className="text-xs uppercase tracking-[0.35em] text-stone-500">
             Próxima experiencia
           </p>
-          <h1 className="mt-4 font-[var(--font-heading)] text-4xl font-semibold text-white sm:text-5xl md:text-6xl">
-            Solicitud de reserva
+          <h1 className="mt-4 font-[var(--font-heading)] text-5xl font-semibold leading-[0.98] tracking-[0.065em] text-white sm:text-6xl md:text-7xl">
+            Reserva de preventa
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-300 sm:text-base">
-            Completá tus datos para solicitar tu lugar en una velada de cupos
-            reducidos.
+          <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
+            Completá tus datos para solicitar tu lugar en la próxima edición de
+            Tertulias Criollas. La reserva es individual y queda sujeta a
+            disponibilidad.
+          </p>
+          <div className="mx-auto mt-6 inline-flex rounded-full border border-white/15 bg-white/[0.04] px-5 py-2 text-xs uppercase tracking-[0.2em] text-stone-200">
+            Cupos disponibles: 25
+          </div>
+          <p className="mt-4 text-xs leading-6 text-stone-500 sm:text-sm">
+            Cada solicitud corresponde a una reserva individual.
           </p>
         </header>
 
         <section className="mt-12 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)] sm:p-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {eventDetails.map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-2xl border border-white/10 bg-black/30 p-5"
+              >
+                <p className="text-xs uppercase tracking-[0.22em] text-stone-500">
+                  {label}
+                </p>
+                <p className="mt-3 font-[var(--font-heading)] text-2xl font-semibold leading-7 tracking-[0.045em] text-stone-100">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 text-center sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-3xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
+              Datos para la preventa
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-stone-400 sm:text-base sm:leading-8">
+              Una vez enviada la solicitud, recibirás por correo electrónico las
+              instrucciones para realizar la transferencia y continuar con la
+              confirmación de tu reserva.
+            </p>
+          </div>
+
+          <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
             {reservationFields.map((field) => (
               <div key={field.id} className="space-y-2">
                 <label htmlFor={field.id} className="block text-sm font-medium text-stone-200">
@@ -110,30 +152,11 @@ export default function ReservationPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-6 py-4 text-sm font-medium uppercase tracking-[0.2em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-full border border-white/20 bg-white/10 px-6 py-4 font-[var(--font-heading)] text-base font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? "Enviando..." : "Reservar lugar"}
             </button>
           </form>
-
-          <div className="mt-10 rounded-2xl border border-white/10 bg-black/30 p-6 text-center sm:p-8">
-            <h2 className="font-[var(--font-heading)] text-2xl text-stone-100 sm:text-3xl">
-              Datos para la preventa
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-stone-400 sm:text-base">
-              Una vez enviada la solicitud, nos contactaremos por correo
-              electrónico para compartir las instrucciones de pago por
-              transferencia y continuar con la confirmación de la reserva.
-            </p>
-            <p className="mt-4 text-sm leading-7 text-stone-400 sm:text-base">
-              La reserva quedará sujeta a disponibilidad y a la validación del
-              pago correspondiente.
-            </p>
-            <p className="mx-auto mt-6 max-w-lg border-t border-white/10 pt-6 text-xs leading-6 text-stone-500 sm:text-sm">
-              Al tratarse de una experiencia privada de cupos reducidos, cada
-              solicitud será revisada individualmente.
-            </p>
-          </div>
         </section>
       </div>
     </main>

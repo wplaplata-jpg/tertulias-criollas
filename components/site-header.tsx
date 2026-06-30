@@ -1,12 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navigation = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Experiencia", href: "#experiencia" },
-  { label: "Reserva", href: "#reserva" },
+  { label: "Quiénes somos", href: "/quienes-somos" },
+  { label: "Reserva", href: "/reserva" },
   { label: "Contacto", href: "#contacto" }
 ] as const;
 
@@ -34,15 +35,22 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
         <Link href="#inicio" className="group flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/[0.04] font-[var(--font-heading)] text-lg text-white transition group-hover:border-white/35 group-hover:bg-white/[0.08]">
-            TC
+          <span className="flex h-14 w-28 items-center justify-start transition sm:w-36">
+            <Image
+              src="/logo.png"
+              alt="Tertulias Criollas"
+              width={180}
+              height={80}
+              className="h-full w-auto object-contain"
+              priority
+            />
           </span>
-          <span className="hidden font-[var(--font-heading)] text-xl text-white sm:block">
+          <span className="hidden font-[var(--font-heading)] text-2xl font-semibold tracking-[0.04em] text-white sm:block">
             Tertulias Criollas
           </span>
         </Link>
 
-        <nav className="flex items-center gap-2 text-[0.58rem] uppercase tracking-[0.1em] text-stone-300 sm:gap-6 sm:text-xs sm:tracking-[0.18em]">
+        <nav className="flex items-center gap-2 font-[var(--font-heading)] text-xs font-semibold uppercase tracking-[0.12em] text-stone-300 sm:gap-5 sm:text-sm sm:tracking-[0.18em]">
           {navigation.map((item) => (
             <Link
               key={item.label}

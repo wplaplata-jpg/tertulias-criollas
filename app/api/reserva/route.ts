@@ -32,13 +32,20 @@ export async function POST(request: Request) {
       );
     }
 
-    await sendReservationEmail({
+    const emailResult = await sendReservationEmail({
       nombreApellido: body.nombreApellido,
       documento: body.documento,
       fechaNacimiento: body.fechaNacimiento,
       email: body.email,
       residencia: body.residencia
     });
+
+    if (!emailResult.success) {
+      return NextResponse.json(
+        { success: false, message: "No se pudo enviar el email." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch {
