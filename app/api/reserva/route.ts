@@ -1,54 +1,137 @@
 import { NextResponse } from "next/server";
 
-import {
-  sendReservationEmail,
-  type ReservationEmailPayload
-} from "@/lib/sendReservationEmail";
+import { prisma } from "@/lib/prisma";
+import { sendReservationEmails } from "@/lib/sendReservationEmail";
 
-function hasReservationFields(data: unknown): data is ReservationEmailPayload {
-  if (!data || typeof data !== "object") {
-    return false;
-  }
+const MAX_CAPACITY = 25;
+const ACTIVE_RESERVATION_STATUSES = ["PENDING", "CONFIRMED"] as const;
 
-  const payload = data as Record<string, unknown>;
+type ReservationRequestBody = {
+  nombreApellido?: unknown;
+  documento?: unknown;
+  fechaNacimiento?: unknown;
+  email?: unknown;
+  residencia?: unknown;
+};
 
-  return (
-    typeof payload.nombreApellido === "string" &&
-    typeof payload.documento === "string" &&
-    typeof payload.fechaNacimiento === "string" &&
-    typeof payload.email === "string" &&
-    typeof payload.residencia === "string"
-  );
+function normalizeText(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function parseBirthDate(value: string) {
+  const date = new Date(`${value}T00:00:00.000Z`);
+
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as ReservationRequestBody;
 
-    if (!hasReservationFields(body)) {
+    const nombreApellido = normalizeText(body.nombreApellido);
+    const documento = normalizeText(body.documento);
+    const fechaNacimientoValue = normalizeText(body.fechaNacimiento);
+    const email = normalizeText(body.email).toLowerCase();
+    const residencia = normalizeText(body.residencia);
+
+    if (
+      !nombreApellido ||
+      !documento ||
+      !fechaNacimientoValue ||
+      !email ||
+      !residencia
+    ) {
       return NextResponse.json(
-        { success: false, message: "Datos incompletos." },
+        { success: false, message: "Todos los campos son obligatorios." },
         { status: 400 }
       );
     }
 
-    const emailResult = await sendReservationEmail({
-      nombreApellido: body.nombreApellido,
-      documento: body.documento,
-      fechaNacimiento: body.fechaNacimiento,
-      email: body.email,
-      residencia: body.residencia
-    });
-
-    if (!emailResult.success) {
+    if (!isValidEmail(email)) {
       return NextResponse.json(
-        { success: false, message: "No se pudo enviar el email." },
-        { status: 500 }
+        { success: false, message: "El email no es válido." },
+        { status: 400 }
       );
     }
 
-    return NextResponse.json({ success: true });
-  } catch {
+    const fechaNacimiento = parseBirthDate(fechaNacimientoValue);
+
+    if (!fechaNacimiento) {
+      return NextResponse.json(
+        { success: false, message: "La fecha de nacimiento no es válida." },
+        { status: 400 }
+      );
+    }
+
+    const reservationResult = await prisma.$transaction(async (tx) => {
+      const reservedSeats = await tx.reservation.count({
+        where: {
+          status: {
+            in: [...ACTIVE_RESERVATION_STATUSES]
+          }
+        }
+      });
+
+      if (reservedSeats >= MAX_CAPACITY) {
+        return null;
+      }
+
+      const reservation = await tx.reservation.create({
+        data: {
+          nombreApellido,
+          documento,
+          fechaNacimiento,
+          email,
+          residencia
+        },
+        select: {
+          id: true,
+          nombreApellido: true,
+          documento: true,
+          fechaNacimiento: true,
+          email: true,
+          residencia: true,
+          createdAt: true
+        }
+      });
+
+      return {
+        reservation,
+        remainingSeats: Math.max(0, MAX_CAPACITY - reservedSeats - 1)
+      };
+    });
+
+    if (!reservationResult) {
+      return NextResponse.json({
+        success: false,
+        error: "No quedan cupos disponibles para esta edición."
+      });
+    }
+
+    const { reservation, remainingSeats } = reservationResult;
+
+    try {
+      await sendReservationEmails(reservation);
+    } catch (emailError) {
+      console.error("La reserva fue registrada, pero falló el envío de email.", {
+        reservationId: reservation.id,
+        error: emailError
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      reservationId: reservation.id,
+      message: "Reserva registrada correctamente",
+      remainingSeats
+    });
+  } catch (error) {
+    console.error("Error guardando la reserva.", error);
+
     return NextResponse.json(
       { success: false, message: "No se pudo procesar la solicitud." },
       { status: 500 }

@@ -1,41 +1,97 @@
-export type ReservationEmailPayload = {
+import { Resend } from "resend";
+
+type ReservationEmailPayload = {
+  id: string;
   nombreApellido: string;
   documento: string;
-  fechaNacimiento: string;
+  fechaNacimiento: Date;
   email: string;
   residencia: string;
+  createdAt: Date;
 };
 
-const ADMIN_EMAIL = "tertuliascriollas@gmail.com";
+const userConfirmationMessage = `Estimado/a,
 
-export async function sendReservationEmail(payload: ReservationEmailPayload) {
-  /*
-   * Integrar aquí el proveedor de email cuando esté definido.
-   *
-   * Ejemplos posibles:
-   * - Resend
-   * - Nodemailer con SMTP propio
-   * - Servicio transaccional de la organización
-   * Cuando haya proveedor real:
-   * - Enviar un email interno a ADMIN_EMAIL con los datos de `payload`.
-   * - Enviar un email de confirmación al usuario usando `payload.email`.
-   */
+Hemos recibido correctamente tu solicitud de reserva de preventa para una próxima edición de Tertulias Criollas.
 
-  console.log("Email interno simulado:", {
-    to: ADMIN_EMAIL,
-    subject: "Nueva solicitud de reserva de preventa",
-    payload
-  });
+En las próximas horas nos pondremos en contacto por este mismo medio para compartir las instrucciones de transferencia y continuar con la confirmación de tu lugar.
 
-  console.log("Email de confirmación simulado:", {
-    to: payload.email,
-    subject: "Solicitud de reserva recibida",
-    message:
-      "Recibimos tu solicitud de reserva de preventa. Nos contactaremos por email para compartir las instrucciones de transferencia y continuar con la confirmación."
-  });
+Recordamos que la reserva queda sujeta a disponibilidad y a la validación del pago correspondiente.
+
+Muchas gracias por tu interés.
+
+Tertulias Criollas`;
+
+function getEmailConfig() {
+  const apiKey = process.env.RESEND_API_KEY;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
+
+  if (!apiKey || !adminEmail || !fromEmail) {
+    throw new Error(
+      "Faltan variables de entorno de Resend: RESEND_API_KEY, ADMIN_EMAIL o RESEND_FROM_EMAIL."
+    );
+  }
 
   return {
-    success: true,
-    simulated: true
+    apiKey,
+    adminEmail,
+    fromEmail
   };
+}
+
+function formatDate(date: Date) {
+  return date.toISOString();
+}
+
+function buildAdminEmailText(reservation: ReservationEmailPayload) {
+  return [
+    "Nueva solicitud de reserva",
+    "Tertulias Criollas",
+    "",
+    "Datos del visitante",
+    "",
+    `Nombre: ${reservation.nombreApellido}`,
+    `Documento: ${reservation.documento}`,
+    `Fecha de nacimiento: ${formatDate(reservation.fechaNacimiento)}`,
+    `Email: ${reservation.email}`,
+    `Residencia: ${reservation.residencia}`,
+    "",
+    "Datos de la solicitud",
+    "",
+    `Código interno de reserva: ${reservation.id}`,
+    `Fecha de creación: ${formatDate(reservation.createdAt)}`
+  ].join("\n");
+}
+
+export async function sendReservationEmails(
+  reservation: ReservationEmailPayload
+) {
+  const { apiKey, adminEmail, fromEmail } = getEmailConfig();
+  const resend = new Resend(apiKey);
+
+  const [adminEmailResult, userEmailResult] = await Promise.all([
+    resend.emails.send({
+      from: fromEmail,
+      to: adminEmail,
+      replyTo: reservation.email,
+      subject: "Nueva solicitud de reserva | Tertulias Criollas",
+      text: buildAdminEmailText(reservation)
+    }),
+    resend.emails.send({
+      from: fromEmail,
+      to: reservation.email,
+      subject: "Solicitud de reserva recibida | Tertulias Criollas",
+      text: userConfirmationMessage
+    })
+  ]);
+
+  if (adminEmailResult.error || userEmailResult.error) {
+    throw new Error(
+      JSON.stringify({
+        adminEmailError: adminEmailResult.error,
+        userEmailError: userEmailResult.error
+      })
+    );
+  }
 }
