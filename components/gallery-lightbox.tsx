@@ -13,13 +13,13 @@ export function GalleryLightbox({ images }: GalleryLightboxProps) {
 
   return (
     <>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
         {images.map((image) => (
           <button
             key={image.src}
             type="button"
             onClick={() => setSelectedImage(image)}
-            className="group relative h-72 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.03] text-left shadow-[0_24px_70px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-1 hover:border-white/25"
+            className="group relative h-56 overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.03] text-left shadow-[0_24px_70px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-1 hover:border-white/25 min-[420px]:h-64 sm:h-72 sm:rounded-[1.5rem]"
           >
             <Image
               src={image.src}
@@ -35,7 +35,7 @@ export function GalleryLightbox({ images }: GalleryLightboxProps) {
 
       {selectedImage ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-4 py-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-3 py-16 sm:px-4 sm:py-8"
           role="dialog"
           aria-modal="true"
           aria-label="Imagen ampliada"
@@ -44,12 +44,12 @@ export function GalleryLightbox({ images }: GalleryLightboxProps) {
           <button
             type="button"
             onClick={() => setSelectedImage(null)}
-            className="absolute right-5 top-5 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 font-[var(--font-heading)] text-sm uppercase tracking-[0.18em] text-stone-100 transition hover:bg-white/[0.12]"
+            className="absolute right-3 top-4 rounded-full border border-white/20 bg-white/[0.06] px-3 py-2 font-[var(--font-heading)] text-xs uppercase tracking-[0.16em] text-stone-100 transition hover:bg-white/[0.12] sm:right-5 sm:top-5 sm:px-4 sm:text-sm sm:tracking-[0.18em]"
           >
             Cerrar
           </button>
           <div
-            className="relative h-[78vh] w-full max-w-5xl overflow-hidden rounded-[1.5rem] border border-white/15 bg-black"
+            className="relative h-[68vh] w-full max-w-5xl overflow-hidden rounded-[1.25rem] border border-white/15 bg-black sm:h-[78vh] sm:rounded-[1.5rem]"
             onClick={(event) => event.stopPropagation()}
           >
             <Image

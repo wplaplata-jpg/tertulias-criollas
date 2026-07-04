@@ -7,20 +7,41 @@ type ReservationEmailPayload = {
   fechaNacimiento: Date;
   email: string;
   residencia: string;
+  telefono?: string | null;
   createdAt: Date;
 };
 
 const userConfirmationMessage = `Estimado/a,
 
-Hemos recibido correctamente tu solicitud de reserva de preventa para una próxima edición de Tertulias Criollas.
+Hemos recibido correctamente tu solicitud de reserva para una próxima edición de Tertulias Criollas.
 
-En las próximas horas nos pondremos en contacto por este mismo medio para compartir las instrucciones de transferencia y continuar con la confirmación de tu lugar.
+En las próximas horas nos pondremos en contacto por este mismo medio para compartir las instrucciones de pago y continuar con la confirmación de tu lugar.
 
 Recordamos que la reserva queda sujeta a disponibilidad y a la validación del pago correspondiente.
 
 Muchas gracias por tu interés.
 
 Tertulias Criollas`;
+
+function buildPaymentConfirmationEmailText(
+  reservation: ReservationEmailPayload
+) {
+  return `Estimado/a,
+
+Tu reserva para Tertulias Criollas ha sido confirmada correctamente.
+
+Presentá este correo el día del encuentro como constancia de confirmación.
+
+Datos de la reserva:
+- Nombre: ${reservation.nombreApellido}
+- Documento: ${reservation.documento}
+- Código interno de reserva: ${reservation.id}
+- Estado: Confirmada
+
+Muchas gracias.
+
+Tertulias Criollas`;
+}
 
 function getEmailConfig() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -45,17 +66,25 @@ function formatDate(date: Date) {
 }
 
 function buildAdminEmailText(reservation: ReservationEmailPayload) {
+  const visitorDetails = [
+    `Nombre: ${reservation.nombreApellido}`,
+    `Documento: ${reservation.documento}`,
+    `Fecha de nacimiento: ${formatDate(reservation.fechaNacimiento)}`,
+    `Email: ${reservation.email}`,
+    `Residencia: ${reservation.residencia}`
+  ];
+
+  if (reservation.telefono) {
+    visitorDetails.push(`Teléfono: ${reservation.telefono}`);
+  }
+
   return [
     "Nueva solicitud de reserva",
     "Tertulias Criollas",
     "",
     "Datos del visitante",
     "",
-    `Nombre: ${reservation.nombreApellido}`,
-    `Documento: ${reservation.documento}`,
-    `Fecha de nacimiento: ${formatDate(reservation.fechaNacimiento)}`,
-    `Email: ${reservation.email}`,
-    `Residencia: ${reservation.residencia}`,
+    ...visitorDetails,
     "",
     "Datos de la solicitud",
     "",
@@ -93,5 +122,23 @@ export async function sendReservationEmails(
         userEmailError: userEmailResult.error
       })
     );
+  }
+}
+
+export async function sendPaymentConfirmationEmail(
+  reservation: ReservationEmailPayload
+) {
+  const { apiKey, fromEmail } = getEmailConfig();
+  const resend = new Resend(apiKey);
+
+  const confirmationEmailResult = await resend.emails.send({
+    from: fromEmail,
+    to: reservation.email,
+    subject: "Reserva confirmada | Tertulias Criollas",
+    text: buildPaymentConfirmationEmailText(reservation)
+  });
+
+  if (confirmationEmailResult.error) {
+    throw new Error(JSON.stringify(confirmationEmailResult.error));
   }
 }

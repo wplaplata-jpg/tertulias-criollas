@@ -21,7 +21,7 @@ html {
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1;
   letter-spacing: 0.055em;
 }
@@ -38,7 +38,7 @@ p {
 .hero-content-reveal {
   opacity: 0;
   transform: translateY(18px);
-  animation: hero-content-reveal 1.45s ease-out 3s forwards;
+  animation: hero-content-reveal 1.45s ease-out 5s forwards;
 }
 
 @keyframes reveal-section {

@@ -12,6 +12,7 @@ type ReservationRequestBody = {
   fechaNacimiento?: unknown;
   email?: unknown;
   residencia?: unknown;
+  telefono?: unknown;
 };
 
 function normalizeText(value: unknown) {
@@ -37,6 +38,7 @@ export async function POST(request: Request) {
     const fechaNacimientoValue = normalizeText(body.fechaNacimiento);
     const email = normalizeText(body.email).toLowerCase();
     const residencia = normalizeText(body.residencia);
+    const telefono = normalizeText(body.telefono);
 
     if (
       !nombreApellido ||
@@ -86,7 +88,8 @@ export async function POST(request: Request) {
           documento,
           fechaNacimiento,
           email,
-          residencia
+          residencia,
+          telefono: telefono || null
         },
         select: {
           id: true,
@@ -95,6 +98,7 @@ export async function POST(request: Request) {
           fechaNacimiento: true,
           email: true,
           residencia: true,
+          telefono: true,
           createdAt: true
         }
       });

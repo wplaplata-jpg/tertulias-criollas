@@ -30,6 +30,12 @@ const reservationFields = [
     label: "Residencia",
     type: "text",
     placeholder: "Ciudad o país"
+  },
+  {
+    id: "telefono",
+    label: "Teléfono",
+    type: "tel",
+    placeholder: "Opcional"
   }
 ] as const;
 
@@ -38,7 +44,13 @@ const encounterConsiderations = [
   "Las Tertulias Criollas se realizan en fechas especialmente seleccionadas y cuentan con capacidad reducida para preservar la intimidad del encuentro.",
   "La dirección exacta y las indicaciones finales de acceso se compartirán únicamente con las reservas confirmadas.",
   "La reserva es individual y queda sujeta a disponibilidad.",
-  "La preventa se completa mediante transferencia, según las instrucciones enviadas por correo electrónico."
+  "La reserva se completa mediante el pago total, según las instrucciones enviadas por correo electrónico."
+] as const;
+
+const paymentMethods = [
+  "Transferencia bancaria",
+  "Mercado Pago con 10% de recargo",
+  "PayPal"
 ] as const;
 
 type ReservationResponse = {
@@ -53,6 +65,15 @@ type SeatAvailability = {
   maxCapacity: number;
   reservedSeats: number;
   remainingSeats: number;
+};
+
+type ReservationPayload = {
+  nombreApellido: FormDataEntryValue | null;
+  documento: FormDataEntryValue | null;
+  fechaNacimiento: FormDataEntryValue | null;
+  email: FormDataEntryValue | null;
+  residencia: FormDataEntryValue | null;
+  telefono?: string;
 };
 
 const fallbackErrorMessage =
@@ -76,9 +97,10 @@ export default function ReservationPage() {
 
   const eventDetails = [
     ["Fecha", "Último sábado de cada mes"],
-    ["Horario", "18:00 a 22:00 hs"],
+    ["Hora de inicio", "18:00 hs"],
+    ["Duración", "2 horas y 30 minutos"],
     ["Lugar", "Casona La EnriSu"],
-    ["Modalidad", "Preventa por transferencia"],
+    ["Modalidad", "Reserva con pago total"],
     ["Cupos", seatsLabel]
   ] as const;
 
@@ -113,6 +135,18 @@ export default function ReservationPage() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const telefono = formData.get("telefono");
+    const payload: ReservationPayload = {
+      nombreApellido: formData.get("nombreApellido"),
+      documento: formData.get("documento"),
+      fechaNacimiento: formData.get("fechaNacimiento"),
+      email: formData.get("email"),
+      residencia: formData.get("residencia")
+    };
+
+    if (typeof telefono === "string" && telefono.trim()) {
+      payload.telefono = telefono.trim();
+    }
 
     try {
       const response = await fetch("/api/reserva", {
@@ -120,13 +154,7 @@ export default function ReservationPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          nombreApellido: formData.get("nombreApellido"),
-          documento: formData.get("documento"),
-          fechaNacimiento: formData.get("fechaNacimiento"),
-          email: formData.get("email"),
-          residencia: formData.get("residencia")
-        })
+        body: JSON.stringify(payload)
       });
 
       const data = (await response.json()) as ReservationResponse;
@@ -134,7 +162,7 @@ export default function ReservationPage() {
       if (data.success === true) {
         setErrorMessage("");
         setSuccessMessage(
-          "Solicitud recibida. Nos contactaremos por email para continuar con la preventa."
+          "Solicitud recibida. Nos contactaremos por email para continuar con la confirmación del pago."
         );
 
         if (typeof data.remainingSeats === "number") {
@@ -164,28 +192,28 @@ export default function ReservationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 px-6 py-12 text-stone-100 sm:py-20">
+    <main className="min-h-screen bg-stone-950 px-4 py-10 text-stone-100 min-[420px]:px-6 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-2xl">
         <Link
           href="/"
-          className="text-xs uppercase tracking-[0.24em] text-stone-400 transition hover:text-stone-100"
+          className="text-[11px] uppercase tracking-[0.2em] text-stone-400 transition hover:text-stone-100 sm:text-xs sm:tracking-[0.24em]"
         >
           Volver a Tertulias Criollas
         </Link>
 
-        <header className="mt-12 text-center sm:mt-16">
-          <p className="text-xs uppercase tracking-[0.35em] text-stone-500">
+        <header className="mt-10 text-center sm:mt-14 lg:mt-16">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-stone-500 sm:text-xs sm:tracking-[0.35em]">
             Próxima experiencia
           </p>
-          <h1 className="mt-4 font-[var(--font-heading)] text-5xl font-semibold leading-[0.98] tracking-[0.065em] text-white sm:text-6xl md:text-7xl">
-            Reserva de preventa
+          <h1 className="mt-4 font-[var(--font-heading)] text-4xl font-semibold leading-[1] tracking-[0.06em] text-white min-[420px]:text-5xl sm:text-6xl md:text-7xl">
+            Entradas
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-300 sm:mt-6 sm:text-base sm:leading-8">
             Completá tus datos para solicitar tu lugar en la próxima edición de
-            Tertulias Criollas. La reserva es individual y queda sujeta a
-            disponibilidad.
+            Tertulias Criollas. La reserva es individual, queda sujeta a
+            disponibilidad y se confirma con la totalidad del pago.
           </p>
-          <div className="mx-auto mt-6 inline-flex rounded-full border border-white/15 bg-white/[0.04] px-5 py-2 text-xs uppercase tracking-[0.2em] text-stone-200">
+          <div className="mx-auto mt-5 inline-flex rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-stone-200 sm:mt-6 sm:px-5 sm:text-xs sm:tracking-[0.2em]">
             {seatsLabel}
           </div>
           {isSoldOut ? (
@@ -199,36 +227,47 @@ export default function ReservationPage() {
           )}
         </header>
 
-        <section className="mt-12 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)] sm:p-10">
+        <section className="mt-10 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 shadow-[0_0_60px_rgba(0,0,0,0.35)] min-[420px]:p-6 sm:mt-12 sm:rounded-[2rem] sm:p-10">
           <div className="grid gap-4 sm:grid-cols-2">
             {eventDetails.map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-2xl border border-white/10 bg-black/30 p-5"
+                className="rounded-2xl border border-white/10 bg-black/30 p-4 sm:p-5"
               >
-                <p className="text-xs uppercase tracking-[0.22em] text-stone-500">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-stone-500 sm:text-xs sm:tracking-[0.22em]">
                   {label}
                 </p>
-                <p className="mt-3 font-[var(--font-heading)] text-2xl font-semibold leading-7 tracking-[0.045em] text-stone-100">
+                <p className="mt-3 font-[var(--font-heading)] text-xl font-semibold leading-7 tracking-[0.045em] text-stone-100 sm:text-2xl">
                   {value}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 text-center sm:p-8">
-            <h2 className="font-[var(--font-heading)] text-3xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
-              Datos para la preventa
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 text-center sm:mt-8 sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
+              Datos para la reserva
             </h2>
             <p className="mt-4 text-sm leading-7 text-stone-400 sm:text-base sm:leading-8">
               Una vez enviada la solicitud, recibirás por correo electrónico las
-              instrucciones para realizar la transferencia y continuar con la
-              confirmación de tu reserva.
+              instrucciones para completar el pago total y continuar con la
+              confirmación de tu lugar.
             </p>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-6 sm:p-8">
-            <h2 className="text-center font-[var(--font-heading)] text-3xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 text-center sm:mt-8 sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
+              Medios de pago disponibles
+            </h2>
+            <div className="mt-5 flex flex-col gap-3 text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
+              {paymentMethods.map((method) => (
+                <span key={method}>{method}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 sm:mt-8 sm:p-8">
+            <h2 className="text-center font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
               Consideraciones para el encuentro
             </h2>
             <ul className="mt-6 space-y-4 text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
@@ -241,7 +280,7 @@ export default function ReservationPage() {
             </ul>
           </div>
 
-          <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-8 space-y-5 sm:mt-10 sm:space-y-6" onSubmit={handleSubmit}>
             {reservationFields.map((field) => (
               <div key={field.id} className="space-y-2">
                 <label
@@ -258,7 +297,7 @@ export default function ReservationPage() {
                     "placeholder" in field ? field.placeholder : undefined
                   }
                   disabled={isSubmitting || isSoldOut}
-                  className="h-14 w-full rounded-2xl border border-white/10 bg-black/40 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/30 focus:bg-black/60 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="min-h-14 w-full rounded-2xl border border-white/10 bg-black/40 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/30 focus:bg-black/60 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
             ))}
@@ -278,7 +317,7 @@ export default function ReservationPage() {
             <button
               type="submit"
               disabled={isSubmitting || isSoldOut}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-6 py-4 font-[var(--font-heading)] text-base font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-full border border-white/20 bg-white/10 px-5 py-4 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:text-base sm:tracking-[0.24em]"
             >
               {isSubmitting ? "Enviando..." : "Reservar lugar"}
             </button>

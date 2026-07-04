@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Cormorant_Infant, Lora } from "next/font/google";
+import { LanguageToggle } from "@/components/language-toggle";
+import { Cormorant_Garamond, Lora } from "next/font/google";
 import "./globals.css";
 
 const headingFont = Cormorant_Garamond({
@@ -15,13 +16,6 @@ const bodyFont = Lora({
   weight: ["400", "500"]
 });
 
-const heroFont = Cormorant_Infant({
-  subsets: ["latin"],
-  variable: "--font-hero",
-  style: ["italic"],
-  weight: ["500"]
-});
-
 export const metadata: Metadata = {
   title: "Tertulias Criollas",
   description: "An exclusive artistic experience"
@@ -35,8 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${headingFont.variable} ${bodyFont.variable} ${heroFont.variable} bg-background font-[var(--font-body)] text-foreground antialiased`}
+        className={`${headingFont.variable} ${bodyFont.variable} bg-background font-[var(--font-body)] text-foreground antialiased`}
       >
+        <LanguageToggle />
         {children}
       </body>
     </html>
