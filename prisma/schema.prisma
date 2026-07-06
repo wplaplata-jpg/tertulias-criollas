@@ -14,10 +14,11 @@ model Reservation {
   fechaNacimiento DateTime
   email           String
   residencia      String
-  telefono        String?
   status          ReservationStatus @default(PENDING)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  telefono        String?
+  publicCode      String?           @unique
 
   @@index([email])
   @@index([status])

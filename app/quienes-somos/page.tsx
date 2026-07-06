@@ -1,21 +1,25 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const artists = [
   {
     name: "Guillermo Hemmingsen",
     role: "Tenor · Director Orquestal",
+    image: "/images/quienes-somos/guillermo.jpg",
     description:
       "Graduado con honores en Música de Cámara y Dirección Orquestal por la Universidad Nacional de La Plata. Formado por destacados maestros nacionales e internacionales, desarrolló una sólida trayectoria artística y docente, con participación en seminarios y masterclasses en instituciones como el Teatro Colón."
   },
   {
     name: "Adriana Hemmingsen",
     role: "Artista Plástica",
+    image: "/images/quienes-somos/adriana.jpg",
     description:
       "Licenciada en Artes Plásticas con especialización en Pintura y Escultura por la Universidad Nacional de La Plata. Su trayectoria incluye premios, exposiciones y una reconocida labor artística, destacándose por su trabajo escultórico y pictórico."
   },
   {
     name: "May Hemmingsen",
     role: "Soprano",
+    image: "/images/quienes-somos/may.jpg",
     description:
       "Formada en el Conservatorio Nacional Carlos López Buchardo y en el Instituto Superior de Arte del Teatro Colón. Ha desarrollado una extensa carrera como solista en importantes escenarios nacionales e internacionales."
   }
@@ -47,21 +51,34 @@ export default function AboutPage() {
           </p>
         </header>
 
-        <section className="mt-10 grid gap-5 sm:mt-14 sm:gap-6 md:grid-cols-3">
+        <section className="mt-10 grid gap-5 sm:mt-14 sm:gap-6 xl:grid-cols-3">
           {artists.map((artist) => (
             <article
               key={artist.name}
-              className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-6 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06] sm:rounded-[2rem] sm:p-8"
+              className="grid overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.035] text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06] sm:rounded-[2rem] md:grid-cols-[0.85fr_1fr] md:text-left xl:block xl:text-center"
             >
-              <p className="font-[var(--font-heading)] text-2xl font-semibold leading-[1] tracking-[0.055em] text-stone-100 sm:text-3xl lg:text-4xl">
-                {artist.name}
-              </p>
-              <p className="mt-3 text-xs uppercase tracking-[0.22em] text-stone-500">
-                {artist.role}
-              </p>
-              <p className="mt-5 text-sm leading-7 text-stone-400 sm:mt-6 sm:text-base sm:leading-8">
-                {artist.description}
-              </p>
+              <div className="relative h-72 overflow-hidden bg-black/30 min-[420px]:h-80 md:h-full md:min-h-[28rem] xl:h-80 xl:min-h-0">
+                <Image
+                  src={artist.image}
+                  alt={artist.name}
+                  fill
+                  sizes="(min-width: 1280px) 33vw, (min-width: 768px) 42vw, 100vw"
+                  className="object-cover object-center transition duration-700 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
+              </div>
+
+              <div className="p-6 sm:p-8">
+                <p className="font-[var(--font-heading)] text-2xl font-semibold leading-[1] tracking-[0.055em] text-stone-100 sm:text-3xl lg:text-4xl">
+                  {artist.name}
+                </p>
+                <p className="mt-3 text-xs uppercase tracking-[0.22em] text-stone-500">
+                  {artist.role}
+                </p>
+                <p className="mt-5 text-sm leading-7 text-stone-400 sm:mt-6 sm:text-base sm:leading-8">
+                  {artist.description}
+                </p>
+              </div>
             </article>
           ))}
         </section>

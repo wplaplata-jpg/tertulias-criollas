@@ -29,6 +29,20 @@ function parseBirthDate(value: string) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function buildPublicCode(sequence: number) {
+  return `TC-${String(sequence).padStart(4, "0")}`;
+}
+
+function getPublicCodeSequence(publicCode: string | null) {
+  if (!publicCode) {
+    return 0;
+  }
+
+  const sequence = Number(publicCode.replace("TC-", ""));
+
+  return Number.isNaN(sequence) ? 0 : sequence;
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as ReservationRequestBody;
@@ -82,6 +96,23 @@ export async function POST(request: Request) {
         return null;
       }
 
+      const lastReservationWithCode = await tx.reservation.findFirst({
+        where: {
+          publicCode: {
+            not: null
+          }
+        },
+        orderBy: {
+          publicCode: "desc"
+        },
+        select: {
+          publicCode: true
+        }
+      });
+      const publicCode = buildPublicCode(
+        getPublicCodeSequence(lastReservationWithCode?.publicCode ?? null) + 1
+      );
+
       const reservation = await tx.reservation.create({
         data: {
           nombreApellido,
@@ -89,10 +120,12 @@ export async function POST(request: Request) {
           fechaNacimiento,
           email,
           residencia,
-          telefono: telefono || null
+          telefono: telefono || null,
+          publicCode
         },
         select: {
           id: true,
+          publicCode: true,
           nombreApellido: true,
           documento: true,
           fechaNacimiento: true,
@@ -130,6 +163,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       reservationId: reservation.id,
+      publicCode: reservation.publicCode,
       message: "Reserva registrada correctamente",
       remainingSeats
     });

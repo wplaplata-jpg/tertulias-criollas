@@ -1,5 +1,10 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import {
+  isAdminAuthenticated,
+  unauthorizedAdminResponse
+} from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { sendPaymentConfirmationEmail } from "@/lib/sendReservationEmail";
 
@@ -9,7 +14,11 @@ type ConfirmReservationContext = {
   };
 };
 
-export async function POST(_request: Request, { params }: ConfirmReservationContext) {
+export async function POST(request: NextRequest, { params }: ConfirmReservationContext) {
+  if (!isAdminAuthenticated(request)) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const reservation = await prisma.reservation.update({
       where: {
@@ -20,10 +29,12 @@ export async function POST(_request: Request, { params }: ConfirmReservationCont
       },
       select: {
         id: true,
+        publicCode: true,
         nombreApellido: true,
         documento: true,
         fechaNacimiento: true,
         email: true,
+        telefono: true,
         residencia: true,
         createdAt: true,
         status: true

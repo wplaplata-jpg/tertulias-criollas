@@ -1,9 +1,8 @@
 ﻿import { ReserveButton } from "@/components/reserve-button";
 import { HeroVideo } from "@/components/hero-video";
 import { SiteHeader } from "@/components/site-header";
+import { GardenPhotoCarousel } from "@/components/garden-photo-carousel";
 import { siteContent } from "@/lib/site";
-import Image from "next/image";
-import Link from "next/link";
 import localFont from "next/font/local";
 
 const heroTitleFont = localFont({
@@ -14,28 +13,25 @@ const heroTitleFont = localFont({
 const experiencePillars = [
   {
     title: "Música en vivo",
+    icon: "music",
     description:
-      "Interpretaciones en vivo de música de cámara por artistas de trayectoria internacional en un entorno íntimo.",
-    image: "/galeria/musica/placeholder-1.svg",
-    href: "/galeria/musica"
+      "Cada encuentro reúne intérpretes de trayectoria, repertorios cuidadosamente seleccionados y una escucha cercana. La música forma parte esencial de la velada, creando un diálogo íntimo entre artistas, anfitriones y público."
   },
   {
     title: "Arte",
+    icon: "art",
     description:
-      "Exposición de obras originales en un recorrido guiado por los espacios de la residencia.",
-    image: "/galeria/arte/placeholder-1.svg",
-    href: "/galeria/arte"
+      "En cada edición se presentan artistas invitados, obras y propuestas que dialogan con el entorno de la residencia. La experiencia visual acompaña el recorrido y construye una atmósfera cultural integrada."
   },
   {
     title: "Gastronomía",
+    icon: "gastronomy",
     description:
-      "Experiencia culinaria de seis pasos con sabores tradicionales argentinos, acompañada por vinos seleccionados.",
-    image: "/galeria/gastronomia/placeholder-1.svg",
-    href: "/galeria/gastronomia"
+      "La propuesta gastronómica está pensada para acompañar la experiencia completa, con productos seleccionados, sabores regionales y un servicio acorde al carácter íntimo y exclusivo del encuentro."
   }
 ] as const;
 
-const WHATSAPP_URL = "https://wa.me/5492210000000";
+const WHATSAPP_URL = "https://wa.me/5492215010965";
 
 const socialLinks = {
   instagram: "https://www.instagram.com/tertulias_criollas_hemmingsen?igsh=MW0wY2Zqd3Bic2J2YQ==",
@@ -79,37 +75,153 @@ const contactLinks = [
   }
 ] as const;
 
-function EditorialImage({
-  src,
-  alt,
-  label
+function PillarIcon({
+  type
 }: {
-  src: string;
-  alt: string;
-  label: string;
+  type: (typeof experiencePillars)[number]["icon"];
 }) {
-  return (
-    <div className="reveal-on-scroll bg-stone-950 px-4 pb-16 min-[420px]:px-6 sm:pb-24 lg:pb-32">
-      <div className="mx-auto max-w-6xl">
-        <div className="relative h-[220px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_35%_25%,rgba(245,222,179,0.18),transparent_34%),linear-gradient(135deg,rgba(68,50,35,0.9),rgba(6,6,6,1))] shadow-[0_30px_90px_rgba(0,0,0,0.38)] min-[420px]:h-[280px] sm:h-[420px] sm:rounded-[2rem] lg:h-[520px]">
-          <div
-            role="img"
-            aria-label={alt}
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${src})` }}
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,rgba(0,0,0,0.42))]" />
-          <div className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-center backdrop-blur-md sm:inset-x-auto sm:left-8 sm:max-w-sm sm:px-5 sm:py-4 sm:text-left">
-            <p className="font-[var(--font-heading)] text-xl font-semibold tracking-[0.05em] text-stone-100 sm:text-2xl">
-              {label}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-stone-400">
-              Imagen preparada para reemplazar por fotografía real.
-            </p>
-          </div>
+  const iconClass = "h-12 w-12 text-[#e5d2a3] sm:h-16 sm:w-16";
+
+  function Medallion({ children }: { children: React.ReactNode }) {
+    return (
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#e5d2a3]/30 bg-[radial-gradient(circle_at_center,rgba(229,210,163,0.12),rgba(255,255,255,0.02)_58%,transparent)] shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:h-24 sm:w-24">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#e5d2a3]/10 sm:h-20 sm:w-20">
+          {children}
         </div>
       </div>
-    </div>
+    );
+  }
+
+  if (type === "music") {
+    return (
+      <Medallion>
+        <svg
+          viewBox="0 0 72 72"
+          aria-hidden="true"
+          className={iconClass}
+          fill="none"
+        >
+          <path
+            d="M39.5 10.5v39.8c0 6.2-5.1 11.2-11.3 11.2s-11.3-5-11.3-11.2 5.1-11.2 11.3-11.2c4.3 0 8.1 2.4 10 5.9"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.25"
+          />
+          <path
+            d="M39.5 10.5c8.4 1.7 13.6 5.6 13.6 11.2 0 4.6-3.5 8.3-9.2 10.1"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.25"
+          />
+          <path
+            d="M23 22.4h27.5M22 29.2h24M22 36h18.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="0.85"
+            opacity="0.52"
+          />
+          <path
+            d="M19 12c-2.7 2-4.3 4.6-4.3 7.5M55.8 52.2c2.4-2.1 3.8-4.6 3.8-7.3"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="0.85"
+            opacity="0.4"
+          />
+        </svg>
+      </Medallion>
+    );
+  }
+
+  if (type === "art") {
+    return (
+      <Medallion>
+        <svg
+          viewBox="0 0 72 72"
+          aria-hidden="true"
+          className={iconClass}
+          fill="none"
+        >
+          <path
+            d="M18 48.5c4.2 4 11.1 6.7 18.8 6.7 13.2 0 23.8-8.6 23.8-19.3S50 16.5 36.8 16.5 13 25.2 13 36c0 3.5 1.9 5.7 5.1 5.7h4.6c3.2 0 5 3.8 3.1 6.3l-1.1 1.4c-1.4 1.8-4.1 1.9-6.7-.9Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.15"
+          />
+          <path
+            d="M28 29h.1M37 25.5h.1M46 29h.1M49.8 39.2h.1"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="2.6"
+          />
+          <path
+            d="M33.5 43.8 52 25.4M47.8 23.8l5.8 5.8"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.1"
+          />
+          <path
+            d="M18.4 21.5c2.5-4.4 7.4-7.7 13.3-9M55.2 51.4c-3 3.3-7.4 5.8-12.6 7"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="0.85"
+            opacity="0.4"
+          />
+        </svg>
+      </Medallion>
+    );
+  }
+
+  return (
+    <Medallion>
+      <svg
+        viewBox="0 0 72 72"
+        aria-hidden="true"
+        className={iconClass}
+        fill="none"
+      >
+        <path
+          d="M24 14h24v10.5c0 6.6-5.4 12-12 12s-12-5.4-12-12V14Z"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.15"
+        />
+        <path
+          d="M36 36.5V57M27.5 57h17M25.8 23h20.4"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.15"
+        />
+        <path
+          d="M54 15v42M59 15v42M54 28h5"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+          opacity="0.78"
+        />
+        <path
+          d="M17 15v42M13.5 15c0 8.5 7 8.5 7 0"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+          opacity="0.78"
+        />
+        <path
+          d="M21.2 11.8c-3.3 1.9-5.7 4.9-6.7 8.5M51.5 60.4c3.4-1.9 5.8-5 6.8-8.8"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="0.85"
+          opacity="0.4"
+        />
+      </svg>
+    </Medallion>
   );
 }
 
@@ -135,7 +247,7 @@ export default function HomePage() {
                 Una experiencia artística exclusiva
               </p>
               <div className="mt-7 flex justify-center sm:mt-10">
-                <ReserveButton label="Reservar Experiencia" />
+                <ReserveButton label="Entradas" />
               </div>
             </div>
           </div>
@@ -163,55 +275,35 @@ export default function HomePage() {
           </div>
         </section>
 
-        <EditorialImage
-          src="/images/evento.jpg"
-          alt="Fotografía de una velada de Tertulias Criollas"
-          label="La intimidad del encuentro"
+        <GardenPhotoCarousel
+          label="Fotografía decorativa de la experiencia"
+          initialIndex={0}
         />
 
-        <section className="reveal-on-scroll bg-black px-4 py-20 min-[420px]:px-6 sm:py-28 lg:py-36">
+        <section className="reveal-on-scroll bg-black px-4 py-16 min-[420px]:px-6 sm:py-28 lg:py-36">
           <div className="mx-auto max-w-6xl">
-            <div className="grid gap-5 sm:gap-8 md:grid-cols-3">
+            <div className="grid gap-4 sm:gap-8 md:grid-cols-3">
               {experiencePillars.map((pillar) => (
                 <article
                   key={pillar.title}
-                  className="group overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/[0.03] transition duration-300 hover:scale-[1.01] hover:bg-white/[0.05] sm:rounded-[2rem]"
+                  className="group flex flex-col justify-between rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-5 py-7 text-center transition duration-300 hover:scale-[1.01] hover:bg-white/[0.05] sm:min-h-[22rem] sm:rounded-[2rem] sm:px-6 sm:py-10"
                 >
-                  <div className="relative h-56 overflow-hidden min-[420px]:h-64 md:h-60 lg:h-64">
-                    <Image
-                      src={pillar.image}
-                      alt={`Galería de ${pillar.title}`}
-                      fill
-                      sizes="(min-width: 768px) 33vw, 100vw"
-                      className="object-cover transition duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/25 transition duration-300 group-hover:bg-black/15" />
-                  </div>
-                  <div className="px-5 py-7 text-center sm:px-6 sm:py-8">
-                    <h3 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
+                  <div>
+                    <div className="mb-5 flex justify-center sm:mb-8">
+                      <PillarIcon type={pillar.icon} />
+                    </div>
+                    <h3 className="font-[var(--font-heading)] text-[1.7rem] font-semibold leading-[1] tracking-[0.055em] text-stone-100 sm:text-3xl">
                       {pillar.title}
                     </h3>
-                    <p className="mt-4 text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
+                    <p className="mt-4 text-[15px] leading-7 text-stone-300 sm:text-base sm:leading-8">
                       {pillar.description}
                     </p>
-                    <Link
-                      href={pillar.href}
-                      className="mt-6 inline-flex rounded-full border border-white/20 bg-white/[0.05] px-5 py-2.5 font-[var(--font-heading)] text-xs font-semibold uppercase tracking-[0.2em] text-stone-100 transition duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/[0.12] sm:mt-7 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.22em]"
-                    >
-                      Explorar
-                    </Link>
                   </div>
                 </article>
               ))}
             </div>
           </div>
         </section>
-
-        <EditorialImage
-          src="/images/jardin.jpg"
-          alt="Jardín y espacio exterior de la residencia"
-          label="El jardín de la residencia"
-        />
 
         <section className="reveal-on-scroll bg-stone-950 px-4 py-20 min-[420px]:px-6 sm:py-28 lg:py-36">
           <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center">
@@ -257,36 +349,42 @@ export default function HomePage() {
 
         <section id="contacto" className="reveal-on-scroll bg-black px-4 py-20 text-center min-[420px]:px-6 sm:py-28 lg:py-36">
           <div className="mx-auto max-w-4xl">
-            <p className="text-xs uppercase tracking-[0.35em] text-stone-500">
-              Redes y contacto
-            </p>
-            <h2 className="mt-4 font-[var(--font-heading)] text-3xl font-semibold leading-[1] tracking-[0.065em] text-stone-100 min-[420px]:text-4xl sm:text-5xl md:text-6xl">
-              Contacto directo
+            <h2 className="font-[var(--font-heading)] text-3xl font-semibold leading-[1] tracking-[0.08em] text-stone-100 min-[420px]:text-4xl sm:text-5xl md:text-6xl">
+              Contacto
             </h2>
-            <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
-              {contactLinks.map((link) => (
-                <a
+            <div className="mx-auto mt-5 h-px w-20 bg-[#d8c39a]/35" />
+            <p className="mx-auto mt-7 max-w-2xl text-[15px] leading-8 text-stone-300 sm:text-lg sm:leading-9">
+              Para consultas sobre próximas fechas, disponibilidad o solicitudes especiales, podés comunicarte directamente con nosotros.
+            </p>
+
+            <nav
+              aria-label="Redes y contacto"
+              className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-4 text-center sm:mt-12 sm:gap-x-6"
+            >
+              {contactLinks.map((link, index) => (
+                <span
                   key={link.label}
-                  href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noreferrer" : undefined}
-                  className="group min-h-36 rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-6 text-center shadow-[0_18px_50px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08] hover:shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:min-h-40 sm:px-6 sm:py-7"
+                  className="inline-flex items-center gap-x-4 sm:gap-x-6"
                 >
-                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-xs text-stone-300">
-                    {link.icon}
-                  </span>
-                  <span className="mt-5 block text-sm font-medium uppercase tracking-[0.18em] text-stone-100">
-                    {link.label}
-                  </span>
-                  <span className="mt-3 block text-sm leading-6 text-stone-400">
-                    {link.description}
-                  </span>
-                  <span className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.18em] text-stone-200 transition group-hover:border-white/30">
-                    {link.buttonLabel}
-                  </span>
-                </a>
+                  <a
+                    href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noreferrer" : undefined}
+                    className="group inline-flex items-center gap-2 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.22em] text-stone-300 transition duration-300 hover:text-[#ead8ad] sm:text-base"
+                  >
+                    <span className="text-xs text-[#d8c39a]/80 transition duration-300 group-hover:text-[#ead8ad]">
+                      {link.icon}
+                    </span>
+                    <span>{link.label}</span>
+                  </a>
+                  {index < contactLinks.length - 1 ? (
+                    <span aria-hidden="true" className="text-[#d8c39a]/35">
+                      ·
+                    </span>
+                  ) : null}
+                </span>
               ))}
-            </div>
+            </nav>
           </div>
         </section>
 
@@ -301,14 +399,17 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs uppercase tracking-[0.18em] text-stone-500 sm:justify-end">
               {contactLinks.map((link) => (
-                <span
+                <a
                   key={link.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-xs text-stone-400"
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noreferrer" : undefined}
+                  className="transition duration-300 hover:text-[#ead8ad]"
                 >
-                  {link.icon}
-                </span>
+                  {link.label}
+                </a>
               ))}
             </div>
           </div>

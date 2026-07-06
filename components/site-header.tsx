@@ -2,12 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import localFont from "next/font/local";
 import { useEffect, useState } from "react";
+
+const monogramFont = localFont({
+  src: "../public/fonts/Tangerine-Regular.ttf",
+  display: "swap"
+});
 
 const navigation = [
   { label: "Inicio", href: "#inicio" },
   { label: "Quiénes somos", href: "/quienes-somos" },
-  { label: "Reserva", href: "/reserva" },
+  { label: "Entradas", href: "/reserva" },
   { label: "Contacto", href: "#contacto" }
 ] as const;
 
@@ -33,29 +39,31 @@ export function SiteHeader() {
           : "border-transparent bg-transparent"
       }`}
     >
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-x-2 gap-y-3 sm:gap-x-4">
-        <Link
-          href="#inicio"
-          className="hidden justify-self-start font-[var(--font-heading)] text-lg font-semibold tracking-[0.04em] text-white transition hover:text-stone-200 lg:block xl:text-2xl"
-        >
-          <span>Tertulias Criollas</span>
-          <span className="sr-only">Inicio</span>
-        </Link>
+      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:gap-x-6 lg:flex-nowrap lg:justify-between">
+        <div className="flex shrink-0 items-center gap-x-3 sm:gap-x-5 lg:gap-x-8">
+          <Link
+            href="#inicio"
+            className={`${monogramFont.className} text-[2.1rem] font-normal leading-none tracking-[0.04em] text-[#e5d2a3] transition hover:text-[#f5e6bd] min-[420px]:text-[2.35rem] sm:text-[2.7rem] lg:text-[3rem] xl:text-[3.25rem]`}
+          >
+            <span aria-hidden="true">TC</span>
+            <span className="sr-only">Inicio</span>
+          </Link>
 
-        <Link href="#inicio" className="group justify-self-center">
-          <span className="flex h-10 w-24 items-center justify-center transition min-[420px]:h-11 min-[420px]:w-28 sm:h-12 sm:w-32 lg:h-14 lg:w-36">
-            <Image
-              src="/logo.png"
-              alt="Tertulias Criollas"
-              width={180}
-              height={80}
-              className="h-full w-auto object-contain"
-              priority
-            />
-          </span>
-        </Link>
+          <Link href="#inicio" className="group">
+            <span className="flex h-9 w-20 items-center justify-center transition min-[420px]:h-10 min-[420px]:w-24 sm:h-12 sm:w-32 lg:h-14 lg:w-36">
+              <Image
+                src="/logo.png"
+                alt="Tertulias Criollas"
+                width={180}
+                height={80}
+                className="h-full w-auto object-contain"
+                priority
+              />
+            </span>
+          </Link>
+        </div>
 
-        <nav className="col-span-3 row-start-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-[var(--font-heading)] text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-300 min-[420px]:gap-x-4 sm:col-span-1 sm:row-start-auto sm:justify-end sm:gap-4 sm:text-xs sm:tracking-[0.16em] lg:gap-5 lg:text-sm lg:tracking-[0.18em]">
+        <nav className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-[var(--font-heading)] text-[10px] font-semibold uppercase tracking-[0.12em] text-stone-300 min-[420px]:gap-x-4 sm:gap-4 sm:text-xs sm:tracking-[0.16em] lg:justify-end lg:gap-5 lg:text-sm lg:tracking-[0.18em]">
           {navigation.map((item) => (
             <Link
               key={item.label}

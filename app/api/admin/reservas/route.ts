@@ -1,5 +1,10 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import {
+  isAdminAuthenticated,
+  unauthorizedAdminResponse
+} from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -7,8 +12,19 @@ export const dynamic = "force-dynamic";
 const MAX_CAPACITY = 25;
 const ACTIVE_RESERVATION_STATUSES = ["PENDING", "CONFIRMED"] as const;
 
-export async function GET() {
-  const [reservations, totalReservations, pendingReservations, confirmedReservations, occupiedSeats] =
+export async function GET(request: NextRequest) {
+  if (!isAdminAuthenticated(request)) {
+    return unauthorizedAdminResponse();
+  }
+
+  const [
+    reservations,
+    totalReservations,
+    pendingReservations,
+    confirmedReservations,
+    cancelledReservations,
+    occupiedSeats
+  ] =
     await Promise.all([
       prisma.reservation.findMany({
         orderBy: {
@@ -16,9 +32,12 @@ export async function GET() {
         },
         select: {
           id: true,
+          publicCode: true,
           nombreApellido: true,
           documento: true,
+          fechaNacimiento: true,
           email: true,
+          telefono: true,
           residencia: true,
           status: true,
           createdAt: true
@@ -37,6 +56,11 @@ export async function GET() {
       }),
       prisma.reservation.count({
         where: {
+          status: "CANCELLED"
+        }
+      }),
+      prisma.reservation.count({
+        where: {
           status: {
             in: [...ACTIVE_RESERVATION_STATUSES]
           }
@@ -50,6 +74,7 @@ export async function GET() {
       totalReservations,
       pendingReservations,
       confirmedReservations,
+      cancelledReservations,
       occupiedSeats,
       remainingSeats: Math.max(0, MAX_CAPACITY - occupiedSeats)
     }

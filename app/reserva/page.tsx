@@ -39,20 +39,6 @@ const reservationFields = [
   }
 ] as const;
 
-const encounterConsiderations = [
-  "Al tratarse de una residencia privada que abre sus puertas de manera excepcional, se invita a los asistentes a concurrir con vestimenta elegante, en armonía con el carácter de la velada.",
-  "Las Tertulias Criollas se realizan en fechas especialmente seleccionadas y cuentan con capacidad reducida para preservar la intimidad del encuentro.",
-  "La dirección exacta y las indicaciones finales de acceso se compartirán únicamente con las reservas confirmadas.",
-  "La reserva es individual y queda sujeta a disponibilidad.",
-  "La reserva se completa mediante el pago total, según las instrucciones enviadas por correo electrónico."
-] as const;
-
-const paymentMethods = [
-  "Transferencia bancaria",
-  "Mercado Pago con 10% de recargo",
-  "PayPal"
-] as const;
-
 type ReservationResponse = {
   success?: boolean;
   reservationId?: string;
@@ -94,15 +80,6 @@ export default function ReservationPage() {
     remainingSeats === null
       ? "Consultando cupos..."
       : `Cupos disponibles: ${remainingSeats} de ${maxCapacity}`;
-
-  const eventDetails = [
-    ["Fecha", "Último sábado de cada mes"],
-    ["Hora de inicio", "18:00 hs"],
-    ["Duración", "2 horas y 30 minutos"],
-    ["Lugar", "Casona La EnriSu"],
-    ["Modalidad", "Reserva con pago total"],
-    ["Cupos", seatsLabel]
-  ] as const;
 
   useEffect(() => {
     async function fetchSeatAvailability() {
@@ -209,9 +186,8 @@ export default function ReservationPage() {
             Entradas
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-300 sm:mt-6 sm:text-base sm:leading-8">
-            Completá tus datos para solicitar tu lugar en la próxima edición de
-            Tertulias Criollas. La reserva es individual, queda sujeta a
-            disponibilidad y se confirma con la totalidad del pago.
+            Completá tus datos para solicitar tu lugar. La reserva queda sujeta
+            a disponibilidad y se confirma una vez acreditado el pago.
           </p>
           <div className="mx-auto mt-5 inline-flex rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-stone-200 sm:mt-6 sm:px-5 sm:text-xs sm:tracking-[0.2em]">
             {seatsLabel}
@@ -227,65 +203,43 @@ export default function ReservationPage() {
           )}
         </header>
 
-        <section className="mt-10 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 shadow-[0_0_60px_rgba(0,0,0,0.35)] min-[420px]:p-6 sm:mt-12 sm:rounded-[2rem] sm:p-10">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {eventDetails.map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-2xl border border-white/10 bg-black/30 p-4 sm:p-5"
-              >
-                <p className="text-[11px] uppercase tracking-[0.18em] text-stone-500 sm:text-xs sm:tracking-[0.22em]">
-                  {label}
-                </p>
-                <p className="mt-3 font-[var(--font-heading)] text-xl font-semibold leading-7 tracking-[0.045em] text-stone-100 sm:text-2xl">
-                  {value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 text-center sm:mt-8 sm:p-8">
-            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
-              Datos para la reserva
+        <section className="mt-10 space-y-5 sm:mt-12 sm:space-y-6">
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 text-center shadow-[0_0_50px_rgba(0,0,0,0.28)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
+              Medios de pago
             </h2>
-            <p className="mt-4 text-sm leading-7 text-stone-400 sm:text-base sm:leading-8">
-              Una vez enviada la solicitud, recibirás por correo electrónico las
-              instrucciones para completar el pago total y continuar con la
-              confirmación de tu lugar.
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
+              Se aceptan todos los medios de pago. La transferencia bancaria es
+              el medio principal. También se encuentran disponibles Mercado
+              Pago, PayPal y otros medios a coordinar.
+            </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-stone-500 sm:text-base sm:leading-8">
+              Mercado Pago puede tener un recargo del 10%.
             </p>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 text-center sm:mt-8 sm:p-8">
-            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
-              Medios de pago disponibles
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_50px_rgba(0,0,0,0.28)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
+              ¿Qué sucede después?
             </h2>
-            <div className="mt-5 flex flex-col gap-3 text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
-              {paymentMethods.map((method) => (
-                <span key={method}>{method}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 sm:mt-8 sm:p-8">
-            <h2 className="text-center font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-4xl">
-              Consideraciones para el encuentro
-            </h2>
-            <ul className="mt-6 space-y-4 text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
-              {encounterConsiderations.map((consideration) => (
-                <li key={consideration} className="flex gap-3">
-                  <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-stone-500" />
-                  <span>{consideration}</span>
-                </li>
-              ))}
+            <ul className="mt-5 space-y-3 text-sm leading-7 text-stone-300 sm:text-base">
+              <li>Completás la solicitud.</li>
+              <li>Recibís por email los datos para realizar el pago.</li>
+              <li>Enviás el comprobante por WhatsApp.</li>
+              <li>Recibís la confirmación definitiva de tu entrada.</li>
             </ul>
           </div>
 
-          <form className="mt-8 space-y-5 sm:mt-10 sm:space-y-6" onSubmit={handleSubmit}>
+          <form
+            className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_0_60px_rgba(0,0,0,0.35)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8"
+            onSubmit={handleSubmit}
+          >
+            <div className="space-y-5 sm:space-y-6">
             {reservationFields.map((field) => (
               <div key={field.id} className="space-y-2">
                 <label
                   htmlFor={field.id}
-                  className="block text-sm font-medium text-stone-200"
+                  className="block text-sm font-medium tracking-[0.02em] text-stone-200"
                 >
                   {field.label}
                 </label>
@@ -297,19 +251,20 @@ export default function ReservationPage() {
                     "placeholder" in field ? field.placeholder : undefined
                   }
                   disabled={isSubmitting || isSoldOut}
-                  className="min-h-14 w-full rounded-2xl border border-white/10 bg-black/40 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/30 focus:bg-black/60 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="min-h-14 w-full rounded-2xl border border-white/10 bg-black/45 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/35 focus:bg-black/65 disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
             ))}
+            </div>
 
             {successMessage ? (
-              <p className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-sm leading-6 text-emerald-100">
+              <p className="mt-6 rounded-2xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-4 text-center text-sm leading-6 text-emerald-100 shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
                 {successMessage}
               </p>
             ) : null}
 
             {errorMessage ? (
-              <p className="rounded-2xl border border-red-300/20 bg-red-300/10 px-4 py-3 text-sm leading-6 text-red-100">
+              <p className="mt-6 rounded-2xl border border-red-300/25 bg-red-300/10 px-4 py-4 text-center text-sm leading-6 text-red-100 shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
                 {errorMessage}
               </p>
             ) : null}
@@ -317,7 +272,7 @@ export default function ReservationPage() {
             <button
               type="submit"
               disabled={isSubmitting || isSoldOut}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-5 py-4 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:text-base sm:tracking-[0.24em]"
+              className="mt-7 w-full rounded-full border border-white/30 bg-stone-100 px-5 py-4 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.18em] text-stone-950 shadow-[0_18px_45px_rgba(255,255,255,0.08)] transition hover:-translate-y-0.5 hover:border-white hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:text-base sm:tracking-[0.24em]"
             >
               {isSubmitting ? "Enviando..." : "Reservar lugar"}
             </button>

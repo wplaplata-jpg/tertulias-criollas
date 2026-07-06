@@ -9,8 +9,10 @@ const translations: Record<string, string> = {
   "Quiénes somos": "About us",
   Reserva: "Reservation",
   Contacto: "Contact",
+  "Para consultas sobre próximas fechas, disponibilidad o solicitudes especiales, podés comunicarte directamente con nosotros.":
+    "For inquiries about upcoming dates, availability or special requests, you can contact us directly.",
   "Una experiencia artística exclusiva": "An exclusive artistic experience",
-  "Reservar Experiencia": "Reserve Experience",
+  "Entradas": "Tickets",
   "Una velada única": "A unique evening",
   "Una experiencia exclusiva a puertas cerradas donde el arte, la música y la gastronomía se combinan en un entorno íntimo y elegante.":
     "An exclusive closed-door experience where art, music and gastronomy come together in an intimate and elegant setting.",
@@ -55,41 +57,35 @@ const translations: Record<string, string> = {
   "English version": "English version",
   "Volver a Tertulias Criollas": "Back to Tertulias Criollas",
   "Próxima experiencia": "Next experience",
-  Entradas: "Tickets",
-  "Completá tus datos para solicitar tu lugar en la próxima edición de Tertulias Criollas. La reserva es individual, queda sujeta a disponibilidad y se confirma con la totalidad del pago.":
-    "Complete your details to request your place at the next edition of Tertulias Criollas. Reservations are individual, subject to availability and confirmed with full payment.",
+  "Completá tus datos para solicitar tu lugar. La reserva queda sujeta a disponibilidad y se confirma una vez acreditado el pago.":
+    "Complete your details to request your place. The reservation is subject to availability and is confirmed once payment is credited.",
   "Consultando cupos...": "Checking availability...",
   "Cada solicitud corresponde a una reserva individual.":
     "Each request corresponds to an individual reservation.",
   Fecha: "Date",
-  "Último sábado de cada mes": "Last Saturday of each month",
-  "Hora de inicio": "Start time",
+  "Últimos sábados de cada mes": "Last Saturdays of each month",
+  Horario: "Time",
   "18:00 hs": "6:00 PM",
-  Duración: "Duration",
+  "Duración aproximada": "Approximate duration",
   "2 horas y 30 minutos": "Approximately 2 hours and 30 minutes",
   Lugar: "Venue",
   "Casona La EnriSu": "Casona La EnriSu",
   Modalidad: "Modality",
   "Reserva con pago total": "Reservation with full payment",
   Cupos: "Seats",
-  "Datos para la reserva": "Reservation details",
-  "Una vez enviada la solicitud, recibirás por correo electrónico las instrucciones para completar el pago total y continuar con la confirmación de tu lugar.":
-    "Once your request is submitted, you will receive the instructions by email to complete the full payment and continue confirming your place.",
-  "Medios de pago disponibles": "Available payment methods",
-  "Transferencia bancaria": "Bank transfer",
-  "Mercado Pago con 10% de recargo": "Mercado Pago with a 10% surcharge",
-  PayPal: "PayPal",
-  "Consideraciones para el encuentro": "Considerations for the gathering",
-  "Al tratarse de una residencia privada que abre sus puertas de manera excepcional, se invita a los asistentes a concurrir con vestimenta elegante, en armonía con el carácter de la velada.":
-    "As this is a private residence opening its doors exceptionally, guests are invited to attend in elegant attire, in keeping with the character of the evening.",
-  "Las Tertulias Criollas se realizan en fechas especialmente seleccionadas y cuentan con capacidad reducida para preservar la intimidad del encuentro.":
-    "Tertulias Criollas take place on specially selected dates and have limited capacity to preserve the intimacy of the gathering.",
-  "La dirección exacta y las indicaciones finales de acceso se compartirán únicamente con las reservas confirmadas.":
-    "The exact address and final access instructions will be shared only with confirmed reservations.",
-  "La reserva es individual y queda sujeta a disponibilidad.":
-    "The reservation is individual and subject to availability.",
-  "La reserva se completa mediante el pago total, según las instrucciones enviadas por correo electrónico.":
-    "The reservation is completed through full payment, according to the instructions sent by email.",
+  "Medios de pago": "Payment methods",
+  "Se aceptan todos los medios de pago. La transferencia bancaria es el medio principal. También se encuentran disponibles Mercado Pago, PayPal y otros medios a coordinar.":
+    "All payment methods are accepted. Bank transfer is the main payment method. Mercado Pago, PayPal and other methods to be coordinated are also available.",
+  "Mercado Pago puede tener un recargo del 10%.":
+    "Mercado Pago may have a 10% surcharge.",
+  "¿Qué sucede después?": "What happens next?",
+  "Completás la solicitud.": "You complete the request.",
+  "Recibís por email los datos para realizar el pago.":
+    "You receive the payment details by email.",
+  "Enviás el comprobante por WhatsApp.":
+    "You send the receipt by WhatsApp.",
+  "Recibís la confirmación definitiva de tu entrada.":
+    "You receive the final confirmation of your ticket.",
   "Nombre y apellido": "Full name",
   "DNI o pasaporte": "ID or passport",
   "Fecha de nacimiento": "Date of birth",

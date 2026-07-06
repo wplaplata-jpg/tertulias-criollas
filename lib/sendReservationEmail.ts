@@ -2,6 +2,7 @@ import { Resend } from "resend";
 
 type ReservationEmailPayload = {
   id: string;
+  publicCode?: string | null;
   nombreApellido: string;
   documento: string;
   fechaNacimiento: Date;
@@ -11,21 +12,51 @@ type ReservationEmailPayload = {
   createdAt: Date;
 };
 
-const userConfirmationMessage = `Estimado/a,
+function buildUserReservationEmailText(reservation: ReservationEmailPayload) {
+  const reservationCode = reservation.publicCode ?? "Sin asignar";
+
+  return `Estimado/a ${reservation.nombreApellido},
 
 Hemos recibido correctamente tu solicitud de reserva para una próxima edición de Tertulias Criollas.
 
-En las próximas horas nos pondremos en contacto por este mismo medio para compartir las instrucciones de pago y continuar con la confirmación de tu lugar.
+La reserva se confirma una vez acreditado el pago correspondiente.
 
-Recordamos que la reserva queda sujeta a disponibilidad y a la validación del pago correspondiente.
+Código de reserva: ${reservationCode}
+
+Datos de pago:
+
+Banco Galicia
+DU: 16763983
+Cuenta: 4017304-5 373-5
+CBU: 0070373230004017304558
+CUIL: 20167639837
+Alias: Tertulias.Criollas.h
+
+Medios disponibles:
+- Transferencia bancaria
+- Mercado Pago (+10%)
+- PayPal
+
+WhatsApp para enviar comprobante:
++54 9 221 501 0965
+https://wa.me/5492215010965
+
+Información del encuentro:
+- Veladas: últimos sábados de cada mes.
+- Horario de inicio: 18:00 hs.
+- Duración aproximada: 2 horas y 30 minutos.
+- Se solicita asistir con vestimenta acorde al carácter de la velada.
 
 Muchas gracias por tu interés.
 
 Tertulias Criollas`;
+}
 
 function buildPaymentConfirmationEmailText(
   reservation: ReservationEmailPayload
 ) {
+  const reservationCode = reservation.publicCode ?? "Sin asignar";
+
   return `Estimado/a,
 
 Tu reserva para Tertulias Criollas ha sido confirmada correctamente.
@@ -35,7 +66,7 @@ Presentá este correo el día del encuentro como constancia de confirmación.
 Datos de la reserva:
 - Nombre: ${reservation.nombreApellido}
 - Documento: ${reservation.documento}
-- Código interno de reserva: ${reservation.id}
+- Código de reserva: ${reservationCode}
 - Estado: Confirmada
 
 Muchas gracias.
@@ -66,6 +97,7 @@ function formatDate(date: Date) {
 }
 
 function buildAdminEmailText(reservation: ReservationEmailPayload) {
+  const reservationCode = reservation.publicCode ?? "Sin asignar";
   const visitorDetails = [
     `Nombre: ${reservation.nombreApellido}`,
     `Documento: ${reservation.documento}`,
@@ -88,7 +120,7 @@ function buildAdminEmailText(reservation: ReservationEmailPayload) {
     "",
     "Datos de la solicitud",
     "",
-    `Código interno de reserva: ${reservation.id}`,
+    `Código de reserva: ${reservationCode}`,
     `Fecha de creación: ${formatDate(reservation.createdAt)}`
   ].join("\n");
 }
@@ -110,8 +142,8 @@ export async function sendReservationEmails(
     resend.emails.send({
       from: fromEmail,
       to: reservation.email,
-      subject: "Solicitud de reserva recibida | Tertulias Criollas",
-      text: userConfirmationMessage
+      subject: "Hemos recibido tu solicitud de reserva | Tertulias Criollas",
+      text: buildUserReservationEmailText(reservation)
     })
   ]);
 
