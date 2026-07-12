@@ -2,6 +2,7 @@ import { Resend } from "resend";
 
 const WHATSAPP_NUMBER = "+54 9 221 501 0965";
 const WHATSAPP_URL = "https://wa.me/5492215010965";
+const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
 
 type ReservationEmailPayload = {
   id: string;
@@ -24,17 +25,39 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function buildEmailHtml(text: string) {
-  const linkedContent = escapeHtml(text).replaceAll(
-    WHATSAPP_NUMBER,
-    `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#8a6f32;text-decoration:underline;">${WHATSAPP_NUMBER}</a>`
-  );
+function buildEmailHtml(text: string, title: string) {
+  const whatsappNumberToken = "__TERTULIAS_WHATSAPP_NUMBER__";
+  const whatsappUrlToken = "__TERTULIAS_WHATSAPP_URL__";
+  const whatsappNumberLink = `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_NUMBER}</a>`;
+  const whatsappUrlLink = `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_URL}</a>`;
+  const linkedContent = escapeHtml(
+    text
+      .replaceAll(WHATSAPP_URL, whatsappUrlToken)
+      .replaceAll(WHATSAPP_NUMBER, whatsappNumberToken)
+  )
+    .replaceAll(
+      whatsappUrlToken,
+      whatsappUrlLink
+    )
+    .replaceAll(
+      whatsappNumberToken,
+      whatsappNumberLink
+    );
 
-  return `<div style="margin:0;padding:28px;background:#0a0a0a;color:#f4efe6;font-family:Georgia,'Times New Roman',serif;line-height:1.7;">
-  <div style="max-width:640px;margin:0 auto;border:1px solid rgba(216,195,154,0.24);border-radius:24px;padding:28px;background:#15130f;">
-    <div style="white-space:pre-wrap;font-size:16px;">${linkedContent}</div>
-  </div>
-</div>`;
+  return `<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#ffffff;">
+    <div style="max-width:600px;margin:0 auto;padding:32px 20px;color:#2f3437;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <img src="${LOGO_URL}" alt="Tertulias Criollas" width="96" style="display:inline-block;width:96px;max-width:96px;height:auto;border:0;" />
+      </div>
+      <h1 style="margin:0 0 24px;color:#17345c;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:600;line-height:1.3;">
+        ${escapeHtml(title)}
+      </h1>
+      <div style="white-space:pre-wrap;">${linkedContent}</div>
+    </div>
+  </body>
+</html>`;
 }
 
 function buildUserReservationEmailText(reservation: ReservationEmailPayload) {
@@ -66,7 +89,7 @@ Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida 
 
 Tertulias Criollas
 
-reservas@tertuliascriollas.com
+tertuliascriollas@gmail.com
 +54 9 221 501 0965
 www.tertuliascriollas.com`;
 }
@@ -94,14 +117,14 @@ Se recomienda asistir con una vestimenta acorde al carácter de la velada.
 
 Si necesitás realizar alguna consulta antes del encuentro, podés comunicarte con nosotros por WhatsApp.
 
-+54 9 221 501 0965
+https://wa.me/5492215010965
 
 Será un placer recibirte y compartir una nueva edición de Tertulias Criollas.
 
 Tertulias Criollas
 
 tertuliascriollas@gmail.com
-+54 9 221 501 0965
+https://wa.me/5492215010965
 www.tertuliascriollas.com`;
 }
 
@@ -176,7 +199,7 @@ export async function sendReservationEmails(
       to: reservation.email,
       subject: "Hemos recibido tu solicitud | Tertulias Criollas",
       text: userEmailText,
-      html: buildEmailHtml(userEmailText)
+      html: buildEmailHtml(userEmailText, "Hemos recibido tu solicitud")
     })
   ]);
 
@@ -202,7 +225,7 @@ export async function sendPaymentConfirmationEmail(
     to: reservation.email,
     subject: "Tu reserva ha sido confirmada | Tertulias Criollas",
     text: confirmationEmailText,
-    html: buildEmailHtml(confirmationEmailText)
+    html: buildEmailHtml(confirmationEmailText, "Tu reserva ha sido confirmada")
   });
 
   if (confirmationEmailResult.error) {
