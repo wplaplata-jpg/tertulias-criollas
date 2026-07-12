@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const WHATSAPP_NUMBER = "+54 9 221 501 0965";
 const WHATSAPP_URL = "https://wa.me/5492215010965";
 const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
-const FOOTER_EMAIL = "reservas@tertuliascriollas.com";
+const FOOTER_EMAIL = "tertuliascriollas@gmail.com";
 
 type ReservationEmailPayload = {
   id: string;
@@ -52,7 +52,7 @@ function buildEmailLayout(title: string, content: string) {
   const footer = `<div style="margin-top:32px;padding-top:18px;border-top:1px solid #e6dcc7;color:#4b5563;font-size:14px;line-height:1.7;">
     <p style="margin:0 0 4px;color:#17345c;font-weight:700;">Tertulias Criollas</p>
     <p style="margin:0;">${FOOTER_EMAIL}</p>
-    <p style="margin:0;">${whatsappNumberLink()}</p>
+    <p style="margin:0;">${whatsappUrlLink()}</p>
     <p style="margin:0;">www.tertuliascriollas.com</p>
   </div>`;
 
@@ -151,7 +151,7 @@ Medios de pago disponibles:
 - PayPal
 
 WhatsApp:
-+54 9 221 501 0965
+https://wa.me/5492215010965
 
 Información del encuentro:
 - Inicio: 18:00 hs.
@@ -165,8 +165,8 @@ Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida 
 
 Tertulias Criollas
 
-reservas@tertuliascriollas.com
-+54 9 221 501 0965
+tertuliascriollas@gmail.com
+https://wa.me/5492215010965
 www.tertuliascriollas.com`;
 }
 
@@ -193,14 +193,14 @@ Se recomienda asistir con una vestimenta acorde al carácter de la velada.
 
 Si necesitás realizar alguna consulta antes del encuentro, podés comunicarte con nosotros por WhatsApp.
 
-+54 9 221 501 0965
+https://wa.me/5492215010965
 
 Será un placer recibirte y compartir una nueva edición de Tertulias Criollas.
 
 Tertulias Criollas
 
-reservas@tertuliascriollas.com
-+54 9 221 501 0965
+tertuliascriollas@gmail.com
+https://wa.me/5492215010965
 www.tertuliascriollas.com`;
 }
 
