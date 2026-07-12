@@ -3,6 +3,7 @@ import { Resend } from "resend";
 const WHATSAPP_NUMBER = "+54 9 221 501 0965";
 const WHATSAPP_URL = "https://wa.me/5492215010965";
 const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
+const FOOTER_EMAIL = "reservas@tertuliascriollas.com";
 
 type ReservationEmailPayload = {
   id: string;
@@ -25,24 +26,35 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function buildEmailHtml(text: string, title: string) {
-  const whatsappNumberToken = "__TERTULIAS_WHATSAPP_NUMBER__";
-  const whatsappUrlToken = "__TERTULIAS_WHATSAPP_URL__";
-  const whatsappNumberLink = `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_NUMBER}</a>`;
-  const whatsappUrlLink = `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_URL}</a>`;
-  const linkedContent = escapeHtml(
-    text
-      .replaceAll(WHATSAPP_URL, whatsappUrlToken)
-      .replaceAll(WHATSAPP_NUMBER, whatsappNumberToken)
-  )
-    .replaceAll(
-      whatsappUrlToken,
-      whatsappUrlLink
-    )
-    .replaceAll(
-      whatsappNumberToken,
-      whatsappNumberLink
-    );
+function paragraph(content: string) {
+  return `<p style="margin:0 0 16px;color:#2f3437;">${escapeHtml(content)}</p>`;
+}
+
+function list(items: string[]) {
+  return `<ul style="margin:0 0 20px;padding-left:22px;color:#2f3437;">${items
+    .map((item) => `<li style="margin:0 0 8px;">${escapeHtml(item)}</li>`)
+    .join("")}</ul>`;
+}
+
+function sectionTitle(content: string) {
+  return `<p style="margin:24px 0 10px;color:#17345c;font-weight:700;">${escapeHtml(content)}</p>`;
+}
+
+function whatsappNumberLink() {
+  return `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_NUMBER}</a>`;
+}
+
+function whatsappUrlLink() {
+  return `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WHATSAPP_URL}</a>`;
+}
+
+function buildEmailLayout(title: string, content: string) {
+  const footer = `<div style="margin-top:32px;padding-top:18px;border-top:1px solid #e6dcc7;color:#4b5563;font-size:14px;line-height:1.7;">
+    <p style="margin:0 0 4px;color:#17345c;font-weight:700;">Tertulias Criollas</p>
+    <p style="margin:0;">${FOOTER_EMAIL}</p>
+    <p style="margin:0;">${whatsappNumberLink()}</p>
+    <p style="margin:0;">www.tertuliascriollas.com</p>
+  </div>`;
 
   return `<!doctype html>
 <html>
@@ -51,13 +63,77 @@ function buildEmailHtml(text: string, title: string) {
       <div style="text-align:center;margin-bottom:28px;">
         <img src="${LOGO_URL}" alt="Tertulias Criollas" width="96" style="display:inline-block;width:96px;max-width:96px;height:auto;border:0;" />
       </div>
-      <h1 style="margin:0 0 24px;color:#17345c;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:600;line-height:1.3;">
+      <h1 style="margin:0 0 24px;color:#17345c;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:600;line-height:1.25;">
         ${escapeHtml(title)}
       </h1>
-      <div style="white-space:pre-wrap;">${linkedContent}</div>
+      ${content}
+      ${footer}
     </div>
   </body>
 </html>`;
+}
+
+function buildUserReservationEmailHtml(reservation: ReservationEmailPayload) {
+  return buildEmailLayout(
+    "Hemos recibido tu solicitud",
+    [
+      paragraph(`Hola, ${reservation.nombreApellido}:`),
+      paragraph(
+        "Muchas gracias por tu interés en participar de una nueva edición de Tertulias Criollas."
+      ),
+      paragraph("Hemos recibido correctamente tu solicitud de reserva."),
+      paragraph(
+        "Para continuar con el proceso, comunicate por WhatsApp y te enviaremos los datos o el enlace correspondiente al medio de pago que prefieras."
+      ),
+      sectionTitle("Medios de pago disponibles:"),
+      list([
+        "Transferencia bancaria (Banco Galicia)",
+        "Mercado Pago (+10 %)",
+        "PayPal"
+      ]),
+      sectionTitle("WhatsApp:"),
+      `<p style="margin:0 0 20px;color:#2f3437;">${whatsappNumberLink()}</p>`,
+      sectionTitle("Información del encuentro:"),
+      list(["Inicio: 18:00 hs.", "Duración aproximada: 2 horas y 30 minutos."]),
+      paragraph(
+        "Una vez recibido y verificado el pago, te enviaremos un nuevo correo con la confirmación definitiva de tu reserva."
+      ),
+      paragraph("Muchas gracias por tu interés."),
+      paragraph(
+        "Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida muy pronto a una nueva velada de Tertulias Criollas."
+      )
+    ].join("")
+  );
+}
+
+function buildPaymentConfirmationEmailHtml(
+  reservation: ReservationEmailPayload
+) {
+  const reservationCode = reservation.publicCode ?? "Sin asignar";
+
+  return buildEmailLayout(
+    "Tu reserva ha sido confirmada",
+    [
+      paragraph(`Hola, ${reservation.nombreApellido}:`),
+      paragraph("Nos complace informarte que hemos recibido correctamente tu pago."),
+      paragraph("Tu reserva ha quedado confirmada."),
+      sectionTitle("Código de reserva:"),
+      `<p style="margin:0 0 20px;color:#17345c;font-size:20px;font-weight:700;letter-spacing:0.04em;">${escapeHtml(reservationCode)}</p>`,
+      sectionTitle("Información del encuentro:"),
+      list(["Inicio: 18:00 hs.", "Duración aproximada: 2 horas y 30 minutos."]),
+      sectionTitle("Información importante:"),
+      paragraph(
+        "Se recomienda asistir con una vestimenta acorde al carácter de la velada."
+      ),
+      paragraph(
+        "Si necesitás realizar alguna consulta antes del encuentro, podés comunicarte con nosotros por WhatsApp."
+      ),
+      `<p style="margin:0 0 20px;color:#2f3437;">${whatsappNumberLink()}</p>`,
+      paragraph(
+        "Será un placer recibirte y compartir una nueva edición de Tertulias Criollas."
+      )
+    ].join("")
+  );
 }
 
 function buildUserReservationEmailText(reservation: ReservationEmailPayload) {
@@ -89,7 +165,7 @@ Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida 
 
 Tertulias Criollas
 
-tertuliascriollas@gmail.com
+reservas@tertuliascriollas.com
 +54 9 221 501 0965
 www.tertuliascriollas.com`;
 }
@@ -117,14 +193,14 @@ Se recomienda asistir con una vestimenta acorde al carácter de la velada.
 
 Si necesitás realizar alguna consulta antes del encuentro, podés comunicarte con nosotros por WhatsApp.
 
-https://wa.me/5492215010965
++54 9 221 501 0965
 
 Será un placer recibirte y compartir una nueva edición de Tertulias Criollas.
 
 Tertulias Criollas
 
-tertuliascriollas@gmail.com
-https://wa.me/5492215010965
+reservas@tertuliascriollas.com
++54 9 221 501 0965
 www.tertuliascriollas.com`;
 }
 
@@ -199,7 +275,7 @@ export async function sendReservationEmails(
       to: reservation.email,
       subject: "Hemos recibido tu solicitud | Tertulias Criollas",
       text: userEmailText,
-      html: buildEmailHtml(userEmailText, "Hemos recibido tu solicitud")
+      html: buildUserReservationEmailHtml(reservation)
     })
   ]);
 
@@ -225,7 +301,7 @@ export async function sendPaymentConfirmationEmail(
     to: reservation.email,
     subject: "Tu reserva ha sido confirmada | Tertulias Criollas",
     text: confirmationEmailText,
-    html: buildEmailHtml(confirmationEmailText, "Tu reserva ha sido confirmada")
+    html: buildPaymentConfirmationEmailHtml(reservation)
   });
 
   if (confirmationEmailResult.error) {
