@@ -1,5 +1,8 @@
 import { Resend } from "resend";
 
+const WHATSAPP_NUMBER = "+54 9 221 501 0965";
+const WHATSAPP_URL = "https://wa.me/5492215010965";
+
 type ReservationEmailPayload = {
   id: string;
   publicCode?: string | null;
@@ -11,6 +14,28 @@ type ReservationEmailPayload = {
   telefono?: string | null;
   createdAt: Date;
 };
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function buildEmailHtml(text: string) {
+  const linkedContent = escapeHtml(text).replaceAll(
+    WHATSAPP_NUMBER,
+    `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" style="color:#8a6f32;text-decoration:underline;">${WHATSAPP_NUMBER}</a>`
+  );
+
+  return `<div style="margin:0;padding:28px;background:#0a0a0a;color:#f4efe6;font-family:Georgia,'Times New Roman',serif;line-height:1.7;">
+  <div style="max-width:640px;margin:0 auto;border:1px solid rgba(216,195,154,0.24);border-radius:24px;padding:28px;background:#15130f;">
+    <div style="white-space:pre-wrap;font-size:16px;">${linkedContent}</div>
+  </div>
+</div>`;
+}
 
 function buildUserReservationEmailText(reservation: ReservationEmailPayload) {
   return `Hola, ${reservation.nombreApellido}:
@@ -136,6 +161,7 @@ export async function sendReservationEmails(
 ) {
   const { apiKey, adminEmail, fromEmail } = getEmailConfig();
   const resend = new Resend(apiKey);
+  const userEmailText = buildUserReservationEmailText(reservation);
 
   const [adminEmailResult, userEmailResult] = await Promise.all([
     resend.emails.send({
@@ -149,7 +175,8 @@ export async function sendReservationEmails(
       from: fromEmail,
       to: reservation.email,
       subject: "Hemos recibido tu solicitud | Tertulias Criollas",
-      text: buildUserReservationEmailText(reservation)
+      text: userEmailText,
+      html: buildEmailHtml(userEmailText)
     })
   ]);
 
@@ -168,12 +195,14 @@ export async function sendPaymentConfirmationEmail(
 ) {
   const { apiKey, fromEmail } = getEmailConfig();
   const resend = new Resend(apiKey);
+  const confirmationEmailText = buildPaymentConfirmationEmailText(reservation);
 
   const confirmationEmailResult = await resend.emails.send({
     from: fromEmail,
     to: reservation.email,
     subject: "Tu reserva ha sido confirmada | Tertulias Criollas",
-    text: buildPaymentConfirmationEmailText(reservation)
+    text: confirmationEmailText,
+    html: buildEmailHtml(confirmationEmailText)
   });
 
   if (confirmationEmailResult.error) {
