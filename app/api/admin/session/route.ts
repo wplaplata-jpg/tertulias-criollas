@@ -7,6 +7,7 @@ import {
   isAdminAuthenticated,
   verifyAdminPassword
 } from "@/lib/admin-auth";
+import { getClientIp, isRateLimited } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,21 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const clientIp = getClientIp(request);
+
+  if (
+    isRateLimited({
+      key: `admin-login:${clientIp}`,
+      limit: 10,
+      windowMs: 15 * 60 * 1000
+    })
+  ) {
+    return NextResponse.json(
+      { success: false, message: "Demasiados intentos. Intentá nuevamente más tarde." },
+      { status: 429 }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     password?: unknown;
   };

@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${headingFont.variable} ${bodyFont.variable} bg-background font-[var(--font-body)] text-foreground antialiased`}
       >

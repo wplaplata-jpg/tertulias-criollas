@@ -1,10 +1,76 @@
 "use client";
 
-import { useRef, useState } from "react";
+import {
+  HERO_AUDIO_COORDINATION_EVENT,
+  type HeroAudioCoordinationDetail
+} from "@/lib/hero-audio-events";
+import { useEffect, useRef, useState } from "react";
 
 export function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const isMutedRef = useRef(false);
+  const mutedBeforeMusicVideoRef = useRef<boolean | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+
+  function setHeroMuted(muted: boolean) {
+    const video = videoRef.current;
+
+    if (video) {
+      video.muted = muted;
+    }
+
+    isMutedRef.current = muted;
+    setIsMuted(muted);
+  }
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    setHeroMuted(false);
+
+    video.play().catch(() => {
+      setHeroMuted(true);
+      void video.play();
+    });
+  }, []);
+
+  useEffect(() => {
+    function handleHeroAudioCoordination(event: Event) {
+      const { musicVideoActive } = (
+        event as CustomEvent<HeroAudioCoordinationDetail>
+      ).detail;
+
+      if (musicVideoActive) {
+        if (mutedBeforeMusicVideoRef.current === null) {
+          mutedBeforeMusicVideoRef.current = isMutedRef.current;
+        }
+
+        setHeroMuted(true);
+        return;
+      }
+
+      if (mutedBeforeMusicVideoRef.current !== null) {
+        setHeroMuted(mutedBeforeMusicVideoRef.current);
+        mutedBeforeMusicVideoRef.current = null;
+      }
+    }
+
+    window.addEventListener(
+      HERO_AUDIO_COORDINATION_EVENT,
+      handleHeroAudioCoordination
+    );
+
+    return () => {
+      window.removeEventListener(
+        HERO_AUDIO_COORDINATION_EVENT,
+        handleHeroAudioCoordination
+      );
+    };
+  }, []);
 
   async function toggleSound() {
     const video = videoRef.current;
@@ -14,13 +80,11 @@ export function HeroVideo() {
     }
 
     const shouldUnmute = video.muted;
-    video.muted = !shouldUnmute;
-    setIsMuted(video.muted);
+    setHeroMuted(!shouldUnmute);
 
     if (shouldUnmute) {
       await video.play().catch(() => {
-        video.muted = true;
-        setIsMuted(true);
+        setHeroMuted(true);
       });
     }
   }

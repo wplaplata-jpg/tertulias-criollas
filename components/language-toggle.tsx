@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type Language = "es" | "en";
 
@@ -22,18 +23,27 @@ const translations: Record<string, string> = {
   "Imagen preparada para reemplazar por fotografía real.":
     "Image area prepared for a future real photograph.",
   "Música en vivo": "Live music",
+  "La música es interpretada por los artistas residentes de Tertulias Criollas, con repertorios cuidadosamente seleccionados para crear una escucha cercana, íntima y profundamente ligada al espíritu de la velada.":
+    "Music is performed by the resident artists of Tertulias Criollas, with carefully selected repertoires designed to create an intimate listening experience deeply connected to the spirit of the evening.",
   "Interpretaciones en vivo de música de cámara por artistas de trayectoria internacional en un entorno íntimo.":
     "Live chamber music performances by internationally experienced artists in an intimate setting.",
   Arte: "Art",
+  "Las artes visuales acompañan cada encuentro a través de obras, objetos y propuestas que dialogan con la residencia, integrando cada espacio a una experiencia cultural sensible y refinada.":
+    "Visual arts accompany each gathering through works, objects and proposals that converse with the residence, integrating each space into a sensitive and refined cultural experience.",
   "Exposición de obras originales en un recorrido guiado por los espacios de la residencia.":
     "An exhibition of original works through a guided walk across the residence.",
   Gastronomía: "Gastronomy",
+  "La propuesta gastronómica está pensada para acompañar la experiencia completa, con productos seleccionados, sabores regionales y un servicio acorde al carácter íntimo y exclusivo del encuentro.":
+    "The gastronomic proposal is designed to accompany the full experience, with selected products, regional flavors and service in keeping with the intimate and exclusive nature of the gathering.",
   "Experiencia culinaria de seis pasos con sabores tradicionales argentinos, acompañada por vinos seleccionados.":
     "A six-course culinary experience with traditional Argentine flavors, paired with selected wines.",
   Explorar: "Explore",
   "El jardín de la residencia": "The residence garden",
   "Residencia privada": "Private residence",
   Ubicación: "Location",
+  "El lugar": "The place",
+  "Una residencia privada especialmente preparada para recibir a los invitados en un entorno íntimo y cuidado.":
+    "A private residence specially prepared to welcome guests in an intimate and carefully curated setting.",
   "La experiencia se realiza en una residencia privada cercana a Buenos Aires. La dirección exacta se comparte únicamente con las reservas confirmadas.":
     "The experience takes place in a private residence near Buenos Aires. The exact address is shared only with confirmed reservations.",
   "Abrir en Google Maps": "Open in Google Maps",
@@ -52,18 +62,41 @@ const translations: Record<string, string> = {
     "Institutional contact and special requests.",
   "Escribir email": "Write email",
   "Experiencias culturales exclusivas": "Exclusive cultural experiences",
+  "Música · Arte · Gastronomía": "Music · Art · Gastronomy",
   "Activar sonido": "Enable sound",
   Silenciar: "Mute",
   "English version": "English version",
   "Volver a Tertulias Criollas": "Back to Tertulias Criollas",
+  "Próximo evento": "Next event",
+  "Próxima velada": "Next evening",
+  "Próximas veladas": "Upcoming evenings",
+  "Próxima velada · Sábado 26 de julio · 18:00 hs":
+    "Next evening · Saturday, July 26 · 6:00 PM",
+  "Duración 2 h 30 min": "Duration 2 h 30 min",
+  "Últimos sábados de cada mes": "Last Saturdays of each month",
+  "Próxima fecha: sábado 26 de julio":
+    "Next date: Saturday, July 26",
+  "Inicio: 18:00 hs": "Start: 6:00 PM",
+  "Duración aproximada: 2 horas y 30 minutos":
+    "Approximate duration: 2 hours and 30 minutes",
+  "Ver entradas": "View tickets",
+  "Una nueva edición de Tertulias Criollas está en preparación.":
+    "A new edition of Tertulias Criollas is being prepared.",
+  "Sábado 26 de julio · 18:00 hs": "Saturday, July 26 · 6:00 PM",
+  "Duración aproximada: 2 h 30 min":
+    "Approximate duration: 2 h 30 min",
+  "Reservar entrada →": "Reserve ticket →",
+  "Último sábado del mes": "Last Saturday of the month",
+  "Reservar entrada": "Reserve ticket",
   "Próxima experiencia": "Next experience",
   "Completá tus datos para solicitar tu lugar. La reserva queda sujeta a disponibilidad y se confirma una vez acreditado el pago.":
     "Complete your details to request your place. The reservation is subject to availability and is confirmed once payment is credited.",
   "Consultando cupos...": "Checking availability...",
+  "Cupos disponibles:": "Available seats:",
+  de: "of",
   "Cada solicitud corresponde a una reserva individual.":
     "Each request corresponds to an individual reservation.",
   Fecha: "Date",
-  "Últimos sábados de cada mes": "Last Saturdays of each month",
   Horario: "Time",
   "18:00 hs": "6:00 PM",
   "Duración aproximada": "Approximate duration",
@@ -78,6 +111,18 @@ const translations: Record<string, string> = {
     "All payment methods are accepted. Bank transfer is the main payment method. Mercado Pago, PayPal and other methods to be coordinated are also available.",
   "Mercado Pago puede tener un recargo del 10%.":
     "Mercado Pago may have a 10% surcharge.",
+  "Participación": "Participation",
+  "Experiencia completa: USD 270 por persona.":
+    "Full experience: USD 270 per person.",
+  "Residentes en Argentina: 30 % de descuento.":
+    "Residents in Argentina: 30% discount.",
+  "Transporte opcional: USD 38 por persona.":
+    "Optional transportation: USD 38 per person.",
+  "Para confirmar la reserva se solicita el pago del 40 % del valor total.":
+    "To confirm the reservation, payment of 40% of the total amount is required.",
+  "Información importante": "Important information",
+  "Se recomienda asistir con una vestimenta acorde al carácter de la velada.":
+    "We recommend attending in attire appropriate to the character of the evening.",
   "¿Qué sucede después?": "What happens next?",
   "Completás la solicitud.": "You complete the request.",
   "Recibís por email los datos para realizar el pago.":
@@ -101,6 +146,8 @@ const translations: Record<string, string> = {
     "Request received. We will contact you by email to continue with payment confirmation.",
   "No pudimos enviar la solicitud. Intentá nuevamente.":
     "We could not send the request. Please try again.",
+  "No quedan cupos disponibles para esta edición.":
+    "There are no seats available for this edition.",
   "Los cupos para esta edición se encuentran completos.":
     "Seats for this edition are sold out.",
   "Reservar lugar": "Reserve place",
@@ -222,22 +269,29 @@ function translatePage(language: Language) {
 }
 
 export function LanguageToggle() {
+  const pathname = usePathname();
   const [language, setLanguage] = useState<Language>("es");
+  const isAdminRoute = pathname.startsWith("/admin");
 
-  const buttonLabel = useMemo(
-    () => (language === "es" ? "English" : "Español"),
-    [language]
-  );
+  const buttonLabel = language === "es" ? "EN" : "ES";
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     const savedLanguage = window.localStorage.getItem("site-language");
 
     if (savedLanguage === "en") {
       setLanguage("en");
     }
-  }, []);
+  }, [isAdminRoute]);
 
   useEffect(() => {
+    if (isAdminRoute) {
+      return;
+    }
+
     window.localStorage.setItem("site-language", language);
     translatePage(language);
 
@@ -252,14 +306,18 @@ export function LanguageToggle() {
     });
 
     return () => observer.disconnect();
-  }, [language]);
+  }, [isAdminRoute, language]);
+
+  if (isAdminRoute) {
+    return null;
+  }
 
   return (
     <button
       type="button"
       data-no-translate
       onClick={() => setLanguage((current) => (current === "es" ? "en" : "es"))}
-      className="fixed right-3 top-[5.9rem] z-[60] rounded-full border border-white/20 bg-black/55 px-3 py-1.5 font-[var(--font-heading)] text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-100 shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-black/75 min-[420px]:right-4 min-[420px]:top-[5.75rem] min-[420px]:px-4 min-[420px]:py-2 sm:right-6 sm:top-[5.5rem] sm:text-xs sm:tracking-[0.2em] lg:top-24"
+      className="fixed right-3 top-[5.9rem] z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/55 font-[var(--font-heading)] text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-100 shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-black/75 min-[420px]:right-4 min-[420px]:top-[5.75rem] min-[420px]:h-11 min-[420px]:w-11 sm:right-6 sm:top-[5.5rem] sm:h-12 sm:w-12 sm:text-xs lg:top-24"
       aria-label={language === "es" ? "Translate to English" : "Cambiar a español"}
     >
       {buttonLabel}

@@ -13,43 +13,37 @@ type ReservationEmailPayload = {
 };
 
 function buildUserReservationEmailText(reservation: ReservationEmailPayload) {
-  const reservationCode = reservation.publicCode ?? "Sin asignar";
+  return `Hola, ${reservation.nombreApellido}:
 
-  return `Estimado/a ${reservation.nombreApellido},
+Muchas gracias por tu interés en participar de una nueva edición de Tertulias Criollas.
 
-Hemos recibido correctamente tu solicitud de reserva para una próxima edición de Tertulias Criollas.
+Hemos recibido correctamente tu solicitud de reserva.
 
-La reserva se confirma una vez acreditado el pago correspondiente.
+Para continuar con el proceso, comunicate por WhatsApp y te enviaremos los datos o el enlace correspondiente al medio de pago que prefieras.
 
-Código de reserva: ${reservationCode}
-
-Datos de pago:
-
-Banco Galicia
-DU: 16763983
-Cuenta: 4017304-5 373-5
-CBU: 0070373230004017304558
-CUIL: 20167639837
-Alias: Tertulias.Criollas.h
-
-Medios disponibles:
-- Transferencia bancaria
-- Mercado Pago (+10%)
+Medios de pago disponibles:
+- Transferencia bancaria (Banco Galicia)
+- Mercado Pago (+10 %)
 - PayPal
 
-WhatsApp para enviar comprobante:
+WhatsApp:
 +54 9 221 501 0965
-https://wa.me/5492215010965
 
 Información del encuentro:
-- Veladas: últimos sábados de cada mes.
-- Horario de inicio: 18:00 hs.
+- Inicio: 18:00 hs.
 - Duración aproximada: 2 horas y 30 minutos.
-- Se solicita asistir con vestimenta acorde al carácter de la velada.
+
+Una vez recibido y verificado el pago, te enviaremos un nuevo correo con la confirmación definitiva de tu reserva.
 
 Muchas gracias por tu interés.
 
-Tertulias Criollas`;
+Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida muy pronto a una nueva velada de Tertulias Criollas.
+
+Tertulias Criollas
+
+reservas@tertuliascriollas.com
++54 9 221 501 0965
+www.tertuliascriollas.com`;
 }
 
 function buildPaymentConfirmationEmailText(
@@ -57,21 +51,33 @@ function buildPaymentConfirmationEmailText(
 ) {
   const reservationCode = reservation.publicCode ?? "Sin asignar";
 
-  return `Estimado/a,
+  return `Hola, ${reservation.nombreApellido}:
 
-Tu reserva para Tertulias Criollas ha sido confirmada correctamente.
+Nos complace informarte que hemos recibido correctamente tu pago.
 
-Presentá este correo el día del encuentro como constancia de confirmación.
+Tu reserva ha quedado confirmada.
 
-Datos de la reserva:
-- Nombre: ${reservation.nombreApellido}
-- Documento: ${reservation.documento}
-- Código de reserva: ${reservationCode}
-- Estado: Confirmada
+Código de reserva:
+${reservationCode}
 
-Muchas gracias.
+Información del encuentro:
+- Inicio: 18:00 hs.
+- Duración aproximada: 2 horas y 30 minutos.
 
-Tertulias Criollas`;
+Información importante:
+Se recomienda asistir con una vestimenta acorde al carácter de la velada.
+
+Si necesitás realizar alguna consulta antes del encuentro, podés comunicarte con nosotros por WhatsApp.
+
++54 9 221 501 0965
+
+Será un placer recibirte y compartir una nueva edición de Tertulias Criollas.
+
+Tertulias Criollas
+
+tertuliascriollas@gmail.com
++54 9 221 501 0965
+www.tertuliascriollas.com`;
 }
 
 function getEmailConfig() {
@@ -142,7 +148,7 @@ export async function sendReservationEmails(
     resend.emails.send({
       from: fromEmail,
       to: reservation.email,
-      subject: "Hemos recibido tu solicitud de reserva | Tertulias Criollas",
+      subject: "Hemos recibido tu solicitud | Tertulias Criollas",
       text: buildUserReservationEmailText(reservation)
     })
   ]);
@@ -166,7 +172,7 @@ export async function sendPaymentConfirmationEmail(
   const confirmationEmailResult = await resend.emails.send({
     from: fromEmail,
     to: reservation.email,
-    subject: "Reserva confirmada | Tertulias Criollas",
+    subject: "Tu reserva ha sido confirmada | Tertulias Criollas",
     text: buildPaymentConfirmationEmailText(reservation)
   });
 

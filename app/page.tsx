@@ -1,8 +1,12 @@
 ﻿import { ReserveButton } from "@/components/reserve-button";
 import { HeroVideo } from "@/components/hero-video";
+import { HeroLogo } from "@/components/hero-logo";
 import { SiteHeader } from "@/components/site-header";
 import { GardenPhotoCarousel } from "@/components/garden-photo-carousel";
+import { MusicPillarCard } from "@/components/music-pillar-card";
+import { ImageSequencePillarCard } from "@/components/image-sequence-pillar-card";
 import { siteContent } from "@/lib/site";
+import Link from "next/link";
 import localFont from "next/font/local";
 
 const heroTitleFont = localFont({
@@ -14,18 +18,21 @@ const experiencePillars = [
   {
     title: "Música en vivo",
     icon: "music",
+    href: "/galeria/musica",
     description:
-      "Cada encuentro reúne intérpretes de trayectoria, repertorios cuidadosamente seleccionados y una escucha cercana. La música forma parte esencial de la velada, creando un diálogo íntimo entre artistas, anfitriones y público."
+      "La música es interpretada por los artistas residentes de Tertulias Criollas, con repertorios cuidadosamente seleccionados para crear una escucha cercana, íntima y profundamente ligada al espíritu de la velada."
   },
   {
     title: "Arte",
     icon: "art",
+    href: "/galeria/arte",
     description:
-      "En cada edición se presentan artistas invitados, obras y propuestas que dialogan con el entorno de la residencia. La experiencia visual acompaña el recorrido y construye una atmósfera cultural integrada."
+      "Las artes visuales acompañan cada encuentro a través de obras, objetos y propuestas que dialogan con la residencia, integrando cada espacio a una experiencia cultural sensible y refinada."
   },
   {
     title: "Gastronomía",
     icon: "gastronomy",
+    href: "/galeria/gastronomia",
     description:
       "La propuesta gastronómica está pensada para acompañar la experiencia completa, con productos seleccionados, sabores regionales y un servicio acorde al carácter íntimo y exclusivo del encuentro."
   }
@@ -64,166 +71,8 @@ const contactLinks = [
     buttonLabel: "Consultar",
     href: socialLinks.whatsapp,
     external: true
-  },
-  {
-    label: "Email",
-    icon: "@",
-    description: "Contacto institucional y solicitudes especiales.",
-    buttonLabel: "Escribir email",
-    href: socialLinks.email,
-    external: false
   }
 ] as const;
-
-function PillarIcon({
-  type
-}: {
-  type: (typeof experiencePillars)[number]["icon"];
-}) {
-  const iconClass = "h-12 w-12 text-[#e5d2a3] sm:h-16 sm:w-16";
-
-  function Medallion({ children }: { children: React.ReactNode }) {
-    return (
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#e5d2a3]/30 bg-[radial-gradient(circle_at_center,rgba(229,210,163,0.12),rgba(255,255,255,0.02)_58%,transparent)] shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:h-24 sm:w-24">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#e5d2a3]/10 sm:h-20 sm:w-20">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
-  if (type === "music") {
-    return (
-      <Medallion>
-        <svg
-          viewBox="0 0 72 72"
-          aria-hidden="true"
-          className={iconClass}
-          fill="none"
-        >
-          <path
-            d="M39.5 10.5v39.8c0 6.2-5.1 11.2-11.3 11.2s-11.3-5-11.3-11.2 5.1-11.2 11.3-11.2c4.3 0 8.1 2.4 10 5.9"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.25"
-          />
-          <path
-            d="M39.5 10.5c8.4 1.7 13.6 5.6 13.6 11.2 0 4.6-3.5 8.3-9.2 10.1"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.25"
-          />
-          <path
-            d="M23 22.4h27.5M22 29.2h24M22 36h18.5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeWidth="0.85"
-            opacity="0.52"
-          />
-          <path
-            d="M19 12c-2.7 2-4.3 4.6-4.3 7.5M55.8 52.2c2.4-2.1 3.8-4.6 3.8-7.3"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeWidth="0.85"
-            opacity="0.4"
-          />
-        </svg>
-      </Medallion>
-    );
-  }
-
-  if (type === "art") {
-    return (
-      <Medallion>
-        <svg
-          viewBox="0 0 72 72"
-          aria-hidden="true"
-          className={iconClass}
-          fill="none"
-        >
-          <path
-            d="M18 48.5c4.2 4 11.1 6.7 18.8 6.7 13.2 0 23.8-8.6 23.8-19.3S50 16.5 36.8 16.5 13 25.2 13 36c0 3.5 1.9 5.7 5.1 5.7h4.6c3.2 0 5 3.8 3.1 6.3l-1.1 1.4c-1.4 1.8-4.1 1.9-6.7-.9Z"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.15"
-          />
-          <path
-            d="M28 29h.1M37 25.5h.1M46 29h.1M49.8 39.2h.1"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeWidth="2.6"
-          />
-          <path
-            d="M33.5 43.8 52 25.4M47.8 23.8l5.8 5.8"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.1"
-          />
-          <path
-            d="M18.4 21.5c2.5-4.4 7.4-7.7 13.3-9M55.2 51.4c-3 3.3-7.4 5.8-12.6 7"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeWidth="0.85"
-            opacity="0.4"
-          />
-        </svg>
-      </Medallion>
-    );
-  }
-
-  return (
-    <Medallion>
-      <svg
-        viewBox="0 0 72 72"
-        aria-hidden="true"
-        className={iconClass}
-        fill="none"
-      >
-        <path
-          d="M24 14h24v10.5c0 6.6-5.4 12-12 12s-12-5.4-12-12V14Z"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.15"
-        />
-        <path
-          d="M36 36.5V57M27.5 57h17M25.8 23h20.4"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.15"
-        />
-        <path
-          d="M54 15v42M59 15v42M54 28h5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1"
-          opacity="0.78"
-        />
-        <path
-          d="M17 15v42M13.5 15c0 8.5 7 8.5 7 0"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1"
-          opacity="0.78"
-        />
-        <path
-          d="M21.2 11.8c-3.3 1.9-5.7 4.9-6.7 8.5M51.5 60.4c3.4-1.9 5.8-5 6.8-8.8"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="0.85"
-          opacity="0.4"
-        />
-      </svg>
-    </Medallion>
-  );
-}
 
 export default function HomePage() {
   return (
@@ -238,6 +87,8 @@ export default function HomePage() {
 
           <div className="absolute inset-0 bg-black/58 sm:bg-black/65 xl:bg-black/60" />
 
+          <HeroLogo />
+
           <div className="relative z-10 flex h-full items-center justify-center px-4 pb-32 pt-36 text-center min-[420px]:px-6 sm:pb-32 sm:pt-28 md:pb-28 lg:pb-24">
             <div className="hero-content-reveal mx-auto w-full max-w-[22rem] min-[420px]:max-w-2xl md:max-w-3xl xl:max-w-4xl">
               <h1 className={`${heroTitleFont.className} text-[clamp(3.8rem,17vw,5.6rem)] font-normal leading-[0.8] tracking-[0.02em] text-[#f8f1e7] [text-shadow:0_3px_18px_rgba(0,0,0,0.42)] sm:text-[clamp(5.8rem,10vw,8rem)] md:text-[8.8rem] xl:text-[10rem] 2xl:text-[11rem]`}>
@@ -250,6 +101,29 @@ export default function HomePage() {
                 <ReserveButton label="Entradas" />
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="bg-black px-4 py-10 min-[420px]:px-6 sm:py-14">
+          <div className="mx-auto max-w-5xl border-t border-[#e5d2a3]/25 pt-8 text-center sm:pt-10">
+            <p className="font-[var(--font-heading)] text-sm uppercase tracking-[0.24em] text-[#e5d2a3] sm:text-base sm:tracking-[0.28em]">
+              Próximas veladas
+            </p>
+            <div className="mt-5 flex flex-col items-center justify-center gap-2 text-sm leading-7 text-stone-300 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:text-base">
+              <span>Últimos sábados de cada mes</span>
+              <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
+              <span>Próxima fecha: sábado 26 de julio</span>
+              <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
+              <span>Inicio: 18:00 hs</span>
+              <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
+              <span>Duración aproximada: 2 horas y 30 minutos</span>
+            </div>
+            <Link
+              href="/reserva"
+              className="mt-6 inline-flex font-[var(--font-heading)] text-sm uppercase tracking-[0.2em] text-stone-300 transition hover:text-[#e5d2a3] sm:text-base"
+            >
+              Ver entradas
+            </Link>
           </div>
         </section>
 
@@ -283,24 +157,39 @@ export default function HomePage() {
         <section className="reveal-on-scroll bg-black px-4 py-16 min-[420px]:px-6 sm:py-28 lg:py-36">
           <div className="mx-auto max-w-6xl">
             <div className="grid gap-4 sm:gap-8 md:grid-cols-3">
-              {experiencePillars.map((pillar) => (
-                <article
-                  key={pillar.title}
-                  className="group flex flex-col justify-between rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-5 py-7 text-center transition duration-300 hover:scale-[1.01] hover:bg-white/[0.05] sm:min-h-[22rem] sm:rounded-[2rem] sm:px-6 sm:py-10"
-                >
-                  <div>
-                    <div className="mb-5 flex justify-center sm:mb-8">
-                      <PillarIcon type={pillar.icon} />
-                    </div>
-                    <h3 className="font-[var(--font-heading)] text-[1.7rem] font-semibold leading-[1] tracking-[0.055em] text-stone-100 sm:text-3xl">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-4 text-[15px] leading-7 text-stone-300 sm:text-base sm:leading-8">
-                      {pillar.description}
-                    </p>
-                  </div>
-                </article>
-              ))}
+              {experiencePillars.map((pillar) =>
+                pillar.icon === "music" ? (
+                  <MusicPillarCard
+                    key={pillar.title}
+                    title={pillar.title}
+                    description={pillar.description}
+                    href={pillar.href}
+                  />
+                ) : (
+                  <ImageSequencePillarCard
+                    key={pillar.title}
+                    title={pillar.title}
+                    description={pillar.description}
+                    type={pillar.icon}
+                    images={
+                      pillar.icon === "art"
+                        ? [
+                          "/galeria/arte/arte1.jpg",
+                          "/galeria/arte/arte2.jpg",
+                          "/galeria/arte/arte3.jpg",
+                          "/galeria/arte/arte4.jpg",
+                          "/galeria/arte/arte5.jpg",
+                          "/galeria/arte/arte6.jpg"
+                        ]
+                        : [
+                          "/galeria/gastronomia/placeholder-1.svg",
+                          "/galeria/gastronomia/placeholder-2.svg",
+                          "/galeria/gastronomia/placeholder-3.svg"
+                        ]
+                    }
+                  />
+                )
+              )}
             </div>
           </div>
         </section>
@@ -315,9 +204,8 @@ export default function HomePage() {
                 Ubicación
               </h2>
               <p className="mt-5 text-[15px] leading-8 text-stone-300 sm:mt-6 sm:text-lg sm:leading-9">
-                La experiencia se realiza en una residencia privada cercana a
-                Buenos Aires. La dirección exacta se comparte únicamente con las
-                reservas confirmadas.
+                Una residencia privada especialmente preparada para recibir a los
+                invitados en un entorno íntimo y cuidado.
               </p>
             </div>
 
@@ -388,30 +276,17 @@ export default function HomePage() {
           </div>
         </section>
 
-        <footer className="border-t border-white/10 bg-stone-950 px-4 py-8 min-[420px]:px-6 sm:py-10">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-center sm:flex-row sm:text-left">
-            <div>
-              <p className="font-[var(--font-heading)] text-2xl text-stone-100">
-                Tertulias Criollas
-              </p>
-              <p className="mt-2 text-sm text-stone-500">
-                Experiencias culturales exclusivas
-              </p>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs uppercase tracking-[0.18em] text-stone-500 sm:justify-end">
-              {contactLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noreferrer" : undefined}
-                  className="transition duration-300 hover:text-[#ead8ad]"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
+        <footer className="bg-stone-950 px-4 py-8 text-center min-[420px]:px-6 sm:py-10">
+          <div className="mx-auto max-w-xl border-t border-[#d8c39a]/25 pt-7">
+            <p className="font-[var(--font-heading)] text-2xl text-stone-100">
+              Tertulias Criollas
+            </p>
+            <p className="mt-2 text-xs uppercase tracking-[0.24em] text-stone-500">
+              Música · Arte · Gastronomía
+            </p>
+            <p className="mt-4 text-sm text-stone-500">
+              www.tertuliascriollas.com
+            </p>
           </div>
         </footer>
       </main>

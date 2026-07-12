@@ -56,6 +56,20 @@ const statusLabels: Record<ReservationStatus, string> = {
   CANCELLED: "Cancelada"
 };
 
+const statusStyles: Record<ReservationStatus, string> = {
+  PENDING: "border-amber-200/25 bg-amber-200/10 text-amber-100",
+  CONTACTED: "border-sky-200/25 bg-sky-200/10 text-sky-100",
+  CONFIRMED: "border-emerald-200/25 bg-emerald-200/10 text-emerald-100",
+  CANCELLED: "border-red-200/25 bg-red-200/10 text-red-100"
+};
+
+const exportStatusOrder: Record<ReservationStatus, number> = {
+  CONFIRMED: 0,
+  PENDING: 1,
+  CONTACTED: 2,
+  CANCELLED: 3
+};
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-AR", {
     dateStyle: "short",
@@ -75,34 +89,219 @@ function escapeCsvValue(value: string | number | null | undefined) {
   return `"${normalizedValue.replaceAll('"', '""')}"`;
 }
 
+function getLastName(fullName: string) {
+  const nameParts = fullName.trim().split(/\s+/);
+
+  return nameParts.length > 1 ? nameParts[nameParts.length - 1] : fullName;
+}
+
+function sortReservationsForEvent(reservations: AdminReservation[]) {
+  return [...reservations].sort((first, second) => {
+    const statusDifference =
+      exportStatusOrder[first.status] - exportStatusOrder[second.status];
+
+    if (statusDifference !== 0) {
+      return statusDifference;
+    }
+
+    return getLastName(first.nombreApellido).localeCompare(
+      getLastName(second.nombreApellido),
+      "es"
+    );
+  });
+}
+
+function escapeHtml(value: string | number | null | undefined) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function buildCsv(reservations: AdminReservation[]) {
   const headers = [
-    "Estado",
-    "Nombre",
+    "Nº",
+    "Código",
+    "Nombre y apellido",
     "Documento",
-    "Email",
-    "Telefono",
+    "Fecha de nacimiento",
     "Residencia",
-    "Fecha nacimiento",
-    "Fecha reserva",
-    "Código de reserva"
+    "Teléfono",
+    "Email",
+    "Estado"
   ];
 
-  const rows = reservations.map((reservation) => [
-    statusLabels[reservation.status],
+  const sortedReservations = sortReservationsForEvent(reservations);
+
+  const rows = sortedReservations.map((reservation, index) => [
+    index + 1,
+    reservation.publicCode ?? "Sin asignar",
     reservation.nombreApellido,
     reservation.documento,
-    reservation.email,
-    reservation.telefono ?? "",
-    reservation.residencia,
     formatBirthDate(reservation.fechaNacimiento),
-    formatDate(reservation.createdAt),
-    reservation.publicCode ?? "Sin asignar"
+    reservation.residencia,
+    reservation.telefono ?? "",
+    reservation.email,
+    statusLabels[reservation.status]
   ]);
 
-  return [headers, ...rows]
+  const confirmedTotal = reservations.filter(
+    (reservation) => reservation.status === "CONFIRMED"
+  ).length;
+
+  return [
+    ["Tertulias Criollas"],
+    ["Listado oficial de asistentes"],
+    ["Fecha de generación", formatDate(new Date().toISOString())],
+    ["Cantidad de reservas confirmadas", confirmedTotal],
+    [],
+    headers,
+    ...rows,
+    [],
+    ["Observaciones"],
+    [""],
+    [""],
+    [""],
+    [""],
+    [""]
+  ]
     .map((row) => row.map(escapeCsvValue).join(","))
     .join("\n");
+}
+
+function buildPdfHtml(reservations: AdminReservation[]) {
+  const sortedReservations = sortReservationsForEvent(reservations);
+  const confirmedTotal = reservations.filter(
+    (reservation) => reservation.status === "CONFIRMED"
+  ).length;
+  const generatedAt = formatDate(new Date().toISOString());
+
+  const rows = sortedReservations
+    .map(
+      (reservation, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${escapeHtml(reservation.publicCode ?? "Sin asignar")}</td>
+          <td>${escapeHtml(reservation.nombreApellido)}</td>
+          <td>${escapeHtml(reservation.documento)}</td>
+          <td>${escapeHtml(formatBirthDate(reservation.fechaNacimiento))}</td>
+          <td>${escapeHtml(reservation.residencia)}</td>
+          <td>${escapeHtml(reservation.telefono ?? "")}</td>
+          <td>${escapeHtml(reservation.email)}</td>
+          <td>${escapeHtml(statusLabels[reservation.status])}</td>
+        </tr>`
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Listado oficial de asistentes - Tertulias Criollas</title>
+    <style>
+      @page { margin: 18mm; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: #1c1917;
+        font-family: Georgia, "Times New Roman", serif;
+        background: #ffffff;
+      }
+      header {
+        border-bottom: 1px solid #bda56f;
+        padding-bottom: 18px;
+        margin-bottom: 22px;
+      }
+      .eyebrow {
+        color: #8a733f;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.1;
+        margin: 0;
+      }
+      .meta {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 16px;
+        font-size: 12px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 11px;
+      }
+      th {
+        background: #f3efe5;
+        color: #4b3f26;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-align: left;
+        text-transform: uppercase;
+      }
+      th, td {
+        border: 1px solid #d8cfbc;
+        padding: 7px 8px;
+        vertical-align: top;
+      }
+      tr:nth-child(even) td { background: #fbfaf7; }
+      .observations {
+        margin-top: 26px;
+        page-break-inside: avoid;
+      }
+      .observations h2 {
+        color: #4b3f26;
+        font-size: 16px;
+        margin: 0 0 10px;
+      }
+      .line {
+        border-bottom: 1px solid #d8cfbc;
+        height: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Tertulias Criollas</p>
+      <h1>Listado oficial de asistentes</h1>
+      <div class="meta">
+        <div><strong>Fecha de generación:</strong> ${escapeHtml(generatedAt)}</div>
+        <div><strong>Reservas confirmadas:</strong> ${confirmedTotal}</div>
+      </div>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Nº</th>
+          <th>Código</th>
+          <th>Nombre y apellido</th>
+          <th>Documento</th>
+          <th>Fecha de nacimiento</th>
+          <th>Residencia</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <section class="observations">
+      <h2>Observaciones</h2>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </section>
+  </body>
+</html>`;
 }
 
 export default function AdminPage() {
@@ -259,7 +458,7 @@ export default function AdminPage() {
   }
 
   function exportCsv() {
-    const csv = buildCsv(reservations);
+    const csv = `\uFEFF${buildCsv(reservations)}`;
     const blob = new Blob([csv], {
       type: "text/csv;charset=utf-8"
     });
@@ -270,6 +469,26 @@ export default function AdminPage() {
     link.download = "reservas-tertulias-criollas.csv";
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  function exportPdf() {
+    const printWindow = window.open("", "_blank");
+
+    if (!printWindow) {
+      setErrorMessage(
+        "No se pudo abrir la ventana de impresión. Revisá el bloqueador de ventanas emergentes."
+      );
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(buildPdfHtml(reservations));
+    printWindow.document.close();
+    printWindow.focus();
+
+    window.setTimeout(() => {
+      printWindow.print();
+    }, 250);
   }
 
   if (isCheckingSession) {
@@ -322,16 +541,20 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 px-4 py-10 text-stone-100 sm:px-6 sm:py-16">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(216,195,154,0.08),transparent_34%),#0a0a0a] px-4 py-10 text-stone-100 sm:px-6 sm:py-16">
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-col gap-6 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-[#d8c39a]">
+            <p className="text-xs uppercase tracking-[0.38em] text-[#d8c39a]/80">
               Administración
             </p>
-            <h1 className="mt-4 font-[var(--font-heading)] text-5xl font-semibold tracking-[0.065em] text-white sm:text-6xl">
+            <h1 className="mt-4 font-[var(--font-heading)] text-5xl font-semibold leading-none tracking-[0.065em] text-stone-50 sm:text-6xl">
               Reservas
             </h1>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-stone-400">
+              Panel de control para seguimiento de solicitudes, cupos y
+              confirmaciones de la próxima velada.
+            </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
@@ -339,7 +562,14 @@ export default function AdminPage() {
               onClick={exportCsv}
               className="rounded-full border border-white/20 bg-white/[0.06] px-5 py-3 font-[var(--font-heading)] text-xs font-semibold uppercase tracking-[0.18em] text-stone-100 transition hover:border-white/40 hover:bg-white/[0.12]"
             >
-              Exportar CSV
+              Generar CSV
+            </button>
+            <button
+              type="button"
+              onClick={exportPdf}
+              className="rounded-full border border-white/20 bg-white/[0.06] px-5 py-3 font-[var(--font-heading)] text-xs font-semibold uppercase tracking-[0.18em] text-stone-100 transition hover:border-white/40 hover:bg-white/[0.12]"
+            >
+              Generar PDF
             </button>
             <button
               type="button"
@@ -351,22 +581,21 @@ export default function AdminPage() {
           </div>
         </header>
 
-        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Reservas recibidas", stats.totalReservations],
+            ["Solicitudes recibidas", stats.totalReservations],
             ["Confirmadas", stats.confirmedReservations],
             ["Pendientes", stats.pendingReservations],
-            ["Canceladas", stats.cancelledReservations],
-            ["Cupos restantes", stats.remainingSeats]
+            ["Cupos disponibles", stats.remainingSeats]
           ].map(([label, value]) => (
             <div
               key={label}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-center shadow-[0_18px_50px_rgba(0,0,0,0.18)]"
+              className="rounded-[1.5rem] border border-[#d8c39a]/15 bg-white/[0.035] p-5 text-center shadow-[0_18px_60px_rgba(0,0,0,0.22)]"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+              <p className="text-xs uppercase tracking-[0.22em] text-stone-500">
                 {label}
               </p>
-              <p className="mt-3 font-[var(--font-heading)] text-4xl text-stone-100">
+              <p className="mt-3 font-[var(--font-heading)] text-4xl text-[#ead8ad]">
                 {value}
               </p>
             </div>
@@ -385,7 +614,7 @@ export default function AdminPage() {
           </p>
         ) : null}
 
-        <section className="mt-8 rounded-[2rem] border border-white/10 bg-white/[0.03] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
+        <section className="mt-8 rounded-[2rem] border border-[#d8c39a]/15 bg-white/[0.03] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <input
               value={query}
@@ -413,7 +642,7 @@ export default function AdminPage() {
 
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[1220px] text-left text-sm">
-              <thead className="border-y border-white/10 bg-black/35 text-xs uppercase tracking-[0.18em] text-stone-500">
+              <thead className="border-y border-[#d8c39a]/15 bg-black/40 text-xs uppercase tracking-[0.18em] text-stone-500">
                 <tr>
                   <th className="px-4 py-4">Estado</th>
                   <th className="px-4 py-4">Código de reserva</th>
@@ -449,7 +678,10 @@ export default function AdminPage() {
                     className="cursor-pointer text-stone-300 transition hover:bg-white/[0.04]"
                   >
                     <td className="px-4 py-4">
-                      <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-stone-200">
+                      <span
+                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${statusStyles[reservation.status]}`}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
                         {statusLabels[reservation.status]}
                       </span>
                     </td>
@@ -518,13 +750,22 @@ export default function AdminPage() {
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                 >
                   <dt className="text-xs uppercase tracking-[0.18em] text-stone-500">
                     {label}
                   </dt>
                   <dd className="mt-2 text-sm leading-6 text-stone-100">
-                    {value}
+                    {label === "Estado" ? (
+                      <span
+                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${statusStyles[selectedReservation.status]}`}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                        {value}
+                      </span>
+                    ) : (
+                      value
+                    )}
                   </dd>
                 </div>
               ))}

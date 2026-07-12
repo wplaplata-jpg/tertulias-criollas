@@ -18,7 +18,11 @@ const reservationFields = [
     type: "text",
     placeholder: "Número de documento"
   },
-  { id: "fechaNacimiento", label: "Fecha de nacimiento", type: "date" },
+  {
+    id: "fechaNacimiento",
+    label: "Fecha de nacimiento",
+    type: "date"
+  },
   {
     id: "email",
     label: "Email",
@@ -35,7 +39,7 @@ const reservationFields = [
     id: "telefono",
     label: "Teléfono",
     type: "tel",
-    placeholder: "Opcional"
+    placeholder: "Teléfono"
   }
 ] as const;
 
@@ -76,10 +80,6 @@ export default function ReservationPage() {
   const remainingSeats = seatAvailability?.remainingSeats ?? null;
   const maxCapacity = seatAvailability?.maxCapacity ?? MAX_CAPACITY;
   const isSoldOut = remainingSeats === 0;
-  const seatsLabel =
-    remainingSeats === null
-      ? "Consultando cupos..."
-      : `Cupos disponibles: ${remainingSeats} de ${maxCapacity}`;
 
   useEffect(() => {
     async function fetchSeatAvailability() {
@@ -190,7 +190,16 @@ export default function ReservationPage() {
             a disponibilidad y se confirma una vez acreditado el pago.
           </p>
           <div className="mx-auto mt-5 inline-flex rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-stone-200 sm:mt-6 sm:px-5 sm:text-xs sm:tracking-[0.2em]">
-            {seatsLabel}
+            {remainingSeats === null ? (
+              "Consultando cupos..."
+            ) : (
+              <>
+                <span>Cupos disponibles:</span>
+                <span className="mx-1">{remainingSeats}</span>
+                <span>de</span>
+                <span className="ml-1">{maxCapacity}</span>
+              </>
+            )}
           </div>
           {isSoldOut ? (
             <p className="mt-4 text-xs leading-6 text-red-200 sm:text-sm">
@@ -204,30 +213,41 @@ export default function ReservationPage() {
         </header>
 
         <section className="mt-10 space-y-5 sm:mt-12 sm:space-y-6">
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 text-center shadow-[0_0_50px_rgba(0,0,0,0.28)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8">
-            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
-              Medios de pago
-            </h2>
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-300 sm:text-base sm:leading-8">
-              Se aceptan todos los medios de pago. La transferencia bancaria es
-              el medio principal. También se encuentran disponibles Mercado
-              Pago, PayPal y otros medios a coordinar.
+          <div className="rounded-[1.5rem] border border-[#e5d2a3]/20 bg-white/[0.025] p-5 text-center shadow-[0_0_40px_rgba(0,0,0,0.22)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-7">
+            <p className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.06em] text-stone-100 sm:text-3xl">
+              Próxima velada
             </p>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-stone-500 sm:text-base sm:leading-8">
-              Mercado Pago puede tener un recargo del 10%.
+            <p className="mt-4 text-sm leading-7 text-stone-300 sm:text-base">
+              Sábado 26 de julio · 18:00 hs
+            </p>
+            <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500 sm:text-sm">
+              Duración aproximada: 2 h 30 min
             </p>
           </div>
 
           <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_50px_rgba(0,0,0,0.28)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8">
             <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
-              ¿Qué sucede después?
+              Participación
             </h2>
             <ul className="mt-5 space-y-3 text-sm leading-7 text-stone-300 sm:text-base">
-              <li>Completás la solicitud.</li>
-              <li>Recibís por email los datos para realizar el pago.</li>
-              <li>Enviás el comprobante por WhatsApp.</li>
-              <li>Recibís la confirmación definitiva de tu entrada.</li>
+              <li>Experiencia completa: USD 270 por persona.</li>
+              <li>Residentes en Argentina: 30 % de descuento.</li>
+              <li>Transporte opcional: USD 38 por persona.</li>
+              <li>
+                Para confirmar la reserva se solicita el pago del 40 % del
+                valor total.
+              </li>
             </ul>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_50px_rgba(0,0,0,0.28)] min-[420px]:p-6 sm:rounded-[2rem] sm:p-8">
+            <h2 className="font-[var(--font-heading)] text-2xl font-semibold tracking-[0.055em] text-stone-100 sm:text-3xl">
+              Información importante
+            </h2>
+            <p className="mt-5 text-sm leading-7 text-stone-300 sm:text-base">
+              Se recomienda asistir con una vestimenta acorde al carácter de la
+              velada.
+            </p>
           </div>
 
           <form
@@ -239,7 +259,7 @@ export default function ReservationPage() {
               <div key={field.id} className="space-y-2">
                 <label
                   htmlFor={field.id}
-                  className="block text-sm font-medium tracking-[0.02em] text-stone-200"
+                    className="block text-sm font-medium tracking-[0.02em] text-stone-200"
                 >
                   {field.label}
                 </label>

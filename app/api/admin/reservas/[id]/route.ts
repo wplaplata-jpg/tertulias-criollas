@@ -97,7 +97,10 @@ export async function PATCH(request: NextRequest, { params }: ReservationContext
       reservation
     });
   } catch (error) {
-    console.error("Error actualizando reserva desde admin.", error);
+    console.error(
+      "Error actualizando reserva desde admin.",
+      error instanceof Error ? error.message : "Error desconocido"
+    );
 
     return NextResponse.json(
       { success: false, message: "No se pudo actualizar la reserva." },

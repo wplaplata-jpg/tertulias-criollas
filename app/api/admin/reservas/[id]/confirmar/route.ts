@@ -48,7 +48,10 @@ export async function POST(request: NextRequest, { params }: ConfirmReservationC
       reservation
     });
   } catch (error) {
-    console.error("Error confirmando la reserva.", error);
+    console.error(
+      "Error confirmando la reserva.",
+      error instanceof Error ? error.message : "Error desconocido"
+    );
 
     return NextResponse.json(
       {

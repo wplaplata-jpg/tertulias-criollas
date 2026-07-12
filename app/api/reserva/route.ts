@@ -1,6 +1,9 @@
+import { Prisma } from "@prisma/client";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { getClientIp, isRateLimited } from "@/lib/rate-limit";
 import { sendReservationEmails } from "@/lib/sendReservationEmail";
 
 const MAX_CAPACITY = 25;
@@ -43,8 +46,33 @@ function getPublicCodeSequence(publicCode: string | null) {
   return Number.isNaN(sequence) ? 0 : sequence;
 }
 
-export async function POST(request: Request) {
+function isRetryableReservationError(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    (error.code === "P2034" || error.code === "P2002")
+  );
+}
+
+export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+
+    if (
+      isRateLimited({
+        key: `reservation:${clientIp}`,
+        limit: 5,
+        windowMs: 10 * 60 * 1000
+      })
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Demasiadas solicitudes. Intentá nuevamente más tarde."
+        },
+        { status: 429 }
+      );
+    }
+
     const body = (await request.json()) as ReservationRequestBody;
 
     const nombreApellido = normalizeText(body.nombreApellido);
@@ -83,64 +111,98 @@ export async function POST(request: Request) {
       );
     }
 
-    const reservationResult = await prisma.$transaction(async (tx) => {
-      const reservedSeats = await tx.reservation.count({
-        where: {
-          status: {
-            in: [...ACTIVE_RESERVATION_STATUSES]
-          }
+    let reservationResult:
+      | {
+          reservation: {
+            id: string;
+            publicCode: string | null;
+            nombreApellido: string;
+            documento: string;
+            fechaNacimiento: Date;
+            email: string;
+            residencia: string;
+            telefono: string | null;
+            createdAt: Date;
+          };
+          remainingSeats: number;
         }
-      });
+      | null = null;
 
-      if (reservedSeats >= MAX_CAPACITY) {
-        return null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        reservationResult = await prisma.$transaction(
+          async (tx) => {
+            const reservedSeats = await tx.reservation.count({
+              where: {
+                status: {
+                  in: [...ACTIVE_RESERVATION_STATUSES]
+                }
+              }
+            });
+
+            if (reservedSeats >= MAX_CAPACITY) {
+              return null;
+            }
+
+            const lastReservationWithCode = await tx.reservation.findFirst({
+              where: {
+                publicCode: {
+                  not: null
+                }
+              },
+              orderBy: {
+                publicCode: "desc"
+              },
+              select: {
+                publicCode: true
+              }
+            });
+            const publicCode = buildPublicCode(
+              getPublicCodeSequence(lastReservationWithCode?.publicCode ?? null) +
+                1
+            );
+
+            const reservation = await tx.reservation.create({
+              data: {
+                nombreApellido,
+                documento,
+                fechaNacimiento,
+                email,
+                residencia,
+                telefono: telefono || null,
+                publicCode
+              },
+              select: {
+                id: true,
+                publicCode: true,
+                nombreApellido: true,
+                documento: true,
+                fechaNacimiento: true,
+                email: true,
+                residencia: true,
+                telefono: true,
+                createdAt: true
+              }
+            });
+
+            return {
+              reservation,
+              remainingSeats: Math.max(0, MAX_CAPACITY - reservedSeats - 1)
+            };
+          },
+          {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable
+          }
+        );
+        break;
+      } catch (transactionError) {
+        if (attempt < 2 && isRetryableReservationError(transactionError)) {
+          continue;
+        }
+
+        throw transactionError;
       }
-
-      const lastReservationWithCode = await tx.reservation.findFirst({
-        where: {
-          publicCode: {
-            not: null
-          }
-        },
-        orderBy: {
-          publicCode: "desc"
-        },
-        select: {
-          publicCode: true
-        }
-      });
-      const publicCode = buildPublicCode(
-        getPublicCodeSequence(lastReservationWithCode?.publicCode ?? null) + 1
-      );
-
-      const reservation = await tx.reservation.create({
-        data: {
-          nombreApellido,
-          documento,
-          fechaNacimiento,
-          email,
-          residencia,
-          telefono: telefono || null,
-          publicCode
-        },
-        select: {
-          id: true,
-          publicCode: true,
-          nombreApellido: true,
-          documento: true,
-          fechaNacimiento: true,
-          email: true,
-          residencia: true,
-          telefono: true,
-          createdAt: true
-        }
-      });
-
-      return {
-        reservation,
-        remainingSeats: Math.max(0, MAX_CAPACITY - reservedSeats - 1)
-      };
-    });
+    }
 
     if (!reservationResult) {
       return NextResponse.json({
@@ -154,10 +216,10 @@ export async function POST(request: Request) {
     try {
       await sendReservationEmails(reservation);
     } catch (emailError) {
-      console.error("La reserva fue registrada, pero falló el envío de email.", {
-        reservationId: reservation.id,
-        error: emailError
-      });
+      console.error(
+        "La reserva fue registrada, pero falló el envío de email.",
+        emailError instanceof Error ? emailError.message : "Error desconocido"
+      );
     }
 
     return NextResponse.json({
@@ -168,7 +230,10 @@ export async function POST(request: Request) {
       remainingSeats
     });
   } catch (error) {
-    console.error("Error guardando la reserva.", error);
+    console.error(
+      "Error guardando la reserva.",
+      error instanceof Error ? error.message : "Error desconocido"
+    );
 
     return NextResponse.json(
       { success: false, message: "No se pudo procesar la solicitud." },
