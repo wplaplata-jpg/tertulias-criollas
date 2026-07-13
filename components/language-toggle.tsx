@@ -118,8 +118,8 @@ const translations: Record<string, string> = {
     "Residents in Argentina: 30% discount.",
   "Transporte opcional: USD 38 por persona.":
     "Optional transportation: USD 38 per person.",
-  "La reserva se confirma mediante el pago total del valor correspondiente.":
-    "The reservation is confirmed once the full amount has been paid.",
+  "Para confirmar la reserva se solicita el pago total del valor correspondiente.":
+    "To confirm the reservation, full payment of the corresponding amount is required.",
   "Información importante": "Important information",
   "Se recomienda asistir con una vestimenta acorde al carácter de la velada.":
     "We recommend attending in attire appropriate to the character of the evening.",
