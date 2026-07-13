@@ -44,7 +44,7 @@ export function HeroLogo() {
 
   return (
     <div
-      className="pointer-events-none absolute left-1/2 top-20 z-20 flex w-[clamp(7.2rem,25.6vw,17.6rem)] items-center justify-center min-[420px]:top-24 md:top-28 xl:w-[clamp(12.8rem,19.2vw,20.8rem)]"
+      className="pointer-events-none absolute left-1/2 top-20 z-20 flex w-[clamp(9rem,32vw,22rem)] items-center justify-center min-[420px]:top-24 sm:w-[clamp(7.2rem,25.6vw,17.6rem)] md:top-28 xl:w-[clamp(12.8rem,19.2vw,20.8rem)]"
       style={{
         opacity,
         transform: `translateX(-50%) scale(${scale})`,
