@@ -112,7 +112,7 @@ export default function HomePage() {
             <div className="mt-5 flex flex-col items-center justify-center gap-2 text-sm leading-7 text-stone-300 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:text-base">
               <span>Últimos sábados de cada mes</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
-              <span>Próxima fecha: sábado 26 de julio</span>
+              <span>Próxima fecha: sábado 25 de julio</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
               <span>Inicio: 18:00 hs</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>

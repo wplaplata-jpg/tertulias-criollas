@@ -218,7 +218,7 @@ export default function ReservationPage() {
               Próxima velada
             </p>
             <p className="mt-4 text-sm leading-7 text-stone-300 sm:text-base">
-              Sábado 26 de julio · 18:00 hs
+              Sábado 25 de julio · 18:00 hs
             </p>
             <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500 sm:text-sm">
               Duración aproximada: 2 h 30 min
@@ -255,26 +255,26 @@ export default function ReservationPage() {
             onSubmit={handleSubmit}
           >
             <div className="space-y-5 sm:space-y-6">
-            {reservationFields.map((field) => (
-              <div key={field.id} className="space-y-2">
-                <label
-                  htmlFor={field.id}
+              {reservationFields.map((field) => (
+                <div key={field.id} className="space-y-2">
+                  <label
+                    htmlFor={field.id}
                     className="block text-sm font-medium tracking-[0.02em] text-stone-200"
-                >
-                  {field.label}
-                </label>
-                <input
-                  id={field.id}
-                  name={field.id}
-                  type={field.type}
-                  placeholder={
-                    "placeholder" in field ? field.placeholder : undefined
-                  }
-                  disabled={isSubmitting || isSoldOut}
-                  className="min-h-14 w-full rounded-2xl border border-white/10 bg-black/45 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/35 focus:bg-black/65 disabled:cursor-not-allowed disabled:opacity-60"
-                />
-              </div>
-            ))}
+                  >
+                    {field.label}
+                  </label>
+                  <input
+                    id={field.id}
+                    name={field.id}
+                    type={field.type}
+                    placeholder={
+                      "placeholder" in field ? field.placeholder : undefined
+                    }
+                    disabled={isSubmitting || isSoldOut}
+                    className="min-h-14 w-full rounded-2xl border border-white/10 bg-black/45 px-4 text-base text-stone-100 outline-none transition placeholder:text-stone-600 focus:border-white/35 focus:bg-black/65 disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                </div>
+              ))}
             </div>
 
             {successMessage ? (
