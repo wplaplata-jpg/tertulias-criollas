@@ -234,8 +234,8 @@ export default function ReservationPage() {
               <li>Residentes en Argentina: 30 % de descuento.</li>
               <li>Transporte opcional: USD 38 por persona.</li>
               <li>
-                Para confirmar la reserva se solicita el pago del 40 % del
-                valor total.
+                La reserva se confirma mediante el pago total del valor
+                correspondiente.
               </li>
             </ul>
           </div>
