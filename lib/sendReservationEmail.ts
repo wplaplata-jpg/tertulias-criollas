@@ -3,9 +3,11 @@ import { Resend } from "resend";
 const WHATSAPP_NUMBER = "+54 9 221 501 0965";
 const WHATSAPP_URL = "https://wa.me/5492215010965";
 const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
-const FOOTER_EMAIL = "tertuliascriollas@gmail.com";
+const FOOTER_EMAIL = "contacto@tertuliascriollas.com";
+const WEBSITE_URL = "https://tertuliascriollas.com";
+const WEBSITE_LABEL = "tertuliascriollas.com";
 
-type ReservationEmailPayload = {
+export type ReservationEmailPayload = {
   id: string;
   publicCode?: string | null;
   nombreApellido: string;
@@ -52,12 +54,16 @@ function emailLink() {
   return `<a href="mailto:${FOOTER_EMAIL}" style="color:#17345c;text-decoration:underline;">${FOOTER_EMAIL}</a>`;
 }
 
+function websiteLink() {
+  return `<a href="${WEBSITE_URL}" target="_blank" rel="noopener noreferrer" style="color:#17345c;text-decoration:underline;">${WEBSITE_LABEL}</a>`;
+}
+
 function buildEmailLayout(title: string, content: string) {
   const footer = `<div style="margin-top:32px;padding-top:18px;border-top:1px solid #e6dcc7;color:#4b5563;font-size:14px;line-height:1.7;">
     <p style="margin:0 0 4px;color:#17345c;font-weight:700;">Tertulias Criollas</p>
     <p style="margin:0;">${emailLink()}</p>
     <p style="margin:0;">${whatsappNumberLink()}</p>
-    <p style="margin:0;">www.tertuliascriollas.com</p>
+    <p style="margin:0;">${websiteLink()}</p>
   </div>`;
 
   return `<!doctype html>
@@ -169,7 +175,7 @@ Quedamos a disposición para cualquier consulta y esperamos darte la bienvenida 
 
 Tertulias Criollas
 
-tertuliascriollas@gmail.com
+contacto@tertuliascriollas.com
 +54 9 221 501 0965
 www.tertuliascriollas.com`;
 }
@@ -203,25 +209,37 @@ Será un placer recibirte y compartir una nueva edición de Tertulias Criollas.
 
 Tertulias Criollas
 
-tertuliascriollas@gmail.com
+contacto@tertuliascriollas.com
 +54 9 221 501 0965
 www.tertuliascriollas.com`;
 }
 
 function getEmailConfig() {
-  const apiKey = process.env.RESEND_API_KEY;
+  const resendConfig = getResendConfig();
   const adminEmail = process.env.ADMIN_EMAIL;
+
+  if (!adminEmail) {
+    throw new Error("Falta la variable de entorno ADMIN_EMAIL.");
+  }
+
+  return {
+    ...resendConfig,
+    adminEmail
+  };
+}
+
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL;
 
-  if (!apiKey || !adminEmail || !fromEmail) {
+  if (!apiKey || !fromEmail) {
     throw new Error(
-      "Faltan variables de entorno de Resend: RESEND_API_KEY, ADMIN_EMAIL o RESEND_FROM_EMAIL."
+      "Faltan variables de entorno de Resend: RESEND_API_KEY o RESEND_FROM_EMAIL."
     );
   }
 
   return {
     apiKey,
-    adminEmail,
     fromEmail
   };
 }
@@ -257,6 +275,58 @@ function buildAdminEmailText(reservation: ReservationEmailPayload) {
     `Código de reserva: ${reservationCode}`,
     `Fecha de creación: ${formatDate(reservation.createdAt)}`
   ].join("\n");
+}
+
+function buildAdminPaymentApprovedEmailText(reservation: ReservationEmailPayload) {
+  const reservationCode = reservation.publicCode ?? reservation.id;
+
+  return [
+    "Pago aprobado",
+    "Tertulias Criollas",
+    "",
+    "Datos del cliente",
+    "",
+    `Nombre: ${reservation.nombreApellido}`,
+    `Email: ${reservation.email}`,
+    `Telefono: ${reservation.telefono || "No informado"}`,
+    "Cantidad de personas / entradas: 1",
+    "",
+    "Datos del pago",
+    "",
+    "Fecha de la tertulia: No especificada",
+    "Importe pagado: No especificado",
+    `ID de reserva: ${reservationCode}`,
+    "ID de pago: No disponible",
+    "Estado del pago: Aprobado"
+  ].join("\n");
+}
+
+function buildAdminPaymentApprovedEmailHtml(
+  reservation: ReservationEmailPayload
+) {
+  const reservationCode = reservation.publicCode ?? reservation.id;
+
+  return buildEmailLayout(
+    "Pago aprobado",
+    [
+      paragraph("Se registro la aprobacion de un pago de reserva."),
+      sectionTitle("Datos del cliente"),
+      list([
+        `Nombre: ${reservation.nombreApellido}`,
+        `Email: ${reservation.email}`,
+        `Telefono: ${reservation.telefono || "No informado"}`,
+        "Cantidad de personas / entradas: 1"
+      ]),
+      sectionTitle("Datos del pago"),
+      list([
+        "Fecha de la tertulia: No especificada",
+        "Importe pagado: No especificado",
+        `ID de reserva: ${reservationCode}`,
+        "ID de pago: No disponible",
+        "Estado del pago: Aprobado"
+      ])
+    ].join("")
+  );
 }
 
 export async function sendReservationEmails(
@@ -296,7 +366,7 @@ export async function sendReservationEmails(
 export async function sendPaymentConfirmationEmail(
   reservation: ReservationEmailPayload
 ) {
-  const { apiKey, fromEmail } = getEmailConfig();
+  const { apiKey, fromEmail } = getResendConfig();
   const resend = new Resend(apiKey);
   const confirmationEmailText = buildPaymentConfirmationEmailText(reservation);
 
@@ -310,5 +380,25 @@ export async function sendPaymentConfirmationEmail(
 
   if (confirmationEmailResult.error) {
     throw new Error(JSON.stringify(confirmationEmailResult.error));
+  }
+}
+
+export async function sendAdminPaymentApprovedEmail(
+  reservation: ReservationEmailPayload
+) {
+  const { apiKey, adminEmail, fromEmail } = getEmailConfig();
+  const resend = new Resend(apiKey);
+
+  const adminEmailResult = await resend.emails.send({
+    from: fromEmail,
+    to: adminEmail,
+    replyTo: reservation.email,
+    subject: `Pago aprobado - ${reservation.nombreApellido}`,
+    text: buildAdminPaymentApprovedEmailText(reservation),
+    html: buildAdminPaymentApprovedEmailHtml(reservation)
+  });
+
+  if (adminEmailResult.error) {
+    throw new Error(JSON.stringify(adminEmailResult.error));
   }
 }

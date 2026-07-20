@@ -1,12 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import type { ReservationEmailPayload } from "@/lib/sendReservationEmail";
 import {
   isAdminAuthenticated,
   unauthorizedAdminResponse
 } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import {
+  sendAdminPaymentApprovedEmail,
   sendPaymentConfirmationEmail,
   sendReservationEmails
 } from "@/lib/sendReservationEmail";
@@ -40,6 +42,21 @@ function selectReservation() {
     status: true,
     createdAt: true
   };
+}
+
+async function sendPaymentApprovedNotifications(
+  reservation: ReservationEmailPayload
+) {
+  await sendPaymentConfirmationEmail(reservation);
+
+  try {
+    await sendAdminPaymentApprovedEmail(reservation);
+  } catch (error) {
+    console.error(
+      "El pago fue confirmado, pero fallo el email administrativo.",
+      error instanceof Error ? error.message : "Error desconocido"
+    );
+  }
 }
 
 export async function PATCH(request: NextRequest, { params }: ReservationContext) {
@@ -78,6 +95,36 @@ export async function PATCH(request: NextRequest, { params }: ReservationContext
       });
     }
 
+    if (body.action === "confirm") {
+      const updateResult = await prisma.reservation.updateMany({
+        where: {
+          id: params.id,
+          status: {
+            not: "CONFIRMED"
+          }
+        },
+        data: {
+          status: "CONFIRMED"
+        }
+      });
+
+      const reservation = await prisma.reservation.findUniqueOrThrow({
+        where: {
+          id: params.id
+        },
+        select: selectReservation()
+      });
+
+      if (updateResult.count > 0) {
+        await sendPaymentApprovedNotifications(reservation);
+      }
+
+      return NextResponse.json({
+        success: true,
+        reservation
+      });
+    }
+
     const reservation = await prisma.reservation.update({
       where: {
         id: params.id
@@ -87,10 +134,6 @@ export async function PATCH(request: NextRequest, { params }: ReservationContext
       },
       select: selectReservation()
     });
-
-    if (body.action === "confirm") {
-      await sendPaymentConfirmationEmail(reservation);
-    }
 
     return NextResponse.json({
       success: true,

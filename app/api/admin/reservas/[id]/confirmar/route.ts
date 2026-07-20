@@ -6,7 +6,10 @@ import {
   unauthorizedAdminResponse
 } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
-import { sendPaymentConfirmationEmail } from "@/lib/sendReservationEmail";
+import {
+  sendAdminPaymentApprovedEmail,
+  sendPaymentConfirmationEmail
+} from "@/lib/sendReservationEmail";
 
 type ConfirmReservationContext = {
   params: {
@@ -20,12 +23,21 @@ export async function POST(request: NextRequest, { params }: ConfirmReservationC
   }
 
   try {
-    const reservation = await prisma.reservation.update({
+    const updateResult = await prisma.reservation.updateMany({
       where: {
-        id: params.id
+        id: params.id,
+        status: {
+          not: "CONFIRMED"
+        }
       },
       data: {
         status: "CONFIRMED"
+      }
+    });
+
+    const reservation = await prisma.reservation.findUniqueOrThrow({
+      where: {
+        id: params.id
       },
       select: {
         id: true,
@@ -41,7 +53,18 @@ export async function POST(request: NextRequest, { params }: ConfirmReservationC
       }
     });
 
-    await sendPaymentConfirmationEmail(reservation);
+    if (updateResult.count > 0) {
+      await sendPaymentConfirmationEmail(reservation);
+
+      try {
+        await sendAdminPaymentApprovedEmail(reservation);
+      } catch (error) {
+        console.error(
+          "El pago fue confirmado, pero fallo el email administrativo.",
+          error instanceof Error ? error.message : "Error desconocido"
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,

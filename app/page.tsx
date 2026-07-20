@@ -44,7 +44,7 @@ const socialLinks = {
   instagram: "https://www.instagram.com/tertulias_criollas_hemmingsen?igsh=MW0wY2Zqd3Bic2J2YQ==",
   youtube: "https://www.youtube.com/@hemmingsenart11",
   whatsapp: WHATSAPP_URL,
-  email: "tertuliascriollas@gmail.com"
+  email: "mailto:contacto@tertuliascriollas.com"
 };
 
 const contactLinks = [
@@ -71,6 +71,14 @@ const contactLinks = [
     buttonLabel: "Consultar",
     href: socialLinks.whatsapp,
     external: true
+  },
+  {
+    label: "Email",
+    icon: "@",
+    description: "Contacto institucional y solicitudes especiales.",
+    buttonLabel: "Escribir email",
+    href: socialLinks.email,
+    external: false
   }
 ] as const;
 
