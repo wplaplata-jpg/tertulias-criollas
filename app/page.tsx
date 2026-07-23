@@ -190,9 +190,10 @@ export default function HomePage() {
                           "/galeria/arte/arte6.jpg"
                         ]
                         : [
-                          "/galeria/gastronomia/placeholder-1.svg",
-                          "/galeria/gastronomia/placeholder-2.svg",
-                          "/galeria/gastronomia/placeholder-3.svg"
+                          "/galeria/gastronomia/gastronomia1.jpg",
+                          "/galeria/gastronomia/gastronomia2.png",
+                          "/galeria/gastronomia/gastronomia3.jpg",
+                          "/galeria/gastronomia/gastronomia4.jpg"
                         ]
                     }
                   />

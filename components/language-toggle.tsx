@@ -74,15 +74,15 @@ const translations: Record<string, string> = {
     "Next evening · Saturday, July 26 · 6:00 PM",
   "Duración 2 h 30 min": "Duration 2 h 30 min",
   "Últimos sábados de cada mes": "Last Saturdays of each month",
-  "Próxima fecha: sábado 26 de julio":
-    "Next date: Saturday, July 26",
+  "Próxima fecha: sábado 25 de julio":
+    "Next date: Saturday, July 25",
   "Inicio: 18:00 hs": "Start: 6:00 PM",
   "Duración aproximada: 2 horas y 30 minutos":
     "Approximate duration: 2 hours and 30 minutes",
   "Ver entradas": "View tickets",
   "Una nueva edición de Tertulias Criollas está en preparación.":
     "A new edition of Tertulias Criollas is being prepared.",
-  "Sábado 26 de julio · 18:00 hs": "Saturday, July 26 · 6:00 PM",
+  "Sábado 25 de julio · 18:00 hs": "Saturday, July 25 · 6:00 PM",
   "Duración aproximada: 2 h 30 min":
     "Approximate duration: 2 h 30 min",
   "Reservar entrada →": "Reserve ticket →",

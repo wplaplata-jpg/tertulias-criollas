@@ -6,6 +6,7 @@ const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
 const FOOTER_EMAIL = "contacto@tertuliascriollas.com";
 const WEBSITE_URL = "https://tertuliascriollas.com";
 const WEBSITE_LABEL = "tertuliascriollas.com";
+const NEXT_EVENT_DATE_LABEL = "sábado 25 de julio";
 
 export type ReservationEmailPayload = {
   id: string;
@@ -104,7 +105,11 @@ function buildUserReservationEmailHtml(reservation: ReservationEmailPayload) {
       sectionTitle("WhatsApp:"),
       `<p style="margin:0 0 20px;color:#2f3437;">${whatsappNumberLink()}</p>`,
       sectionTitle("Información del encuentro:"),
-      list(["Inicio: 18:00 hs.", "Duración aproximada: 2 horas y 30 minutos."]),
+      list([
+        `Fecha: ${NEXT_EVENT_DATE_LABEL}.`,
+        "Inicio: 18:00 hs.",
+        "Duración aproximada: 2 horas y 30 minutos."
+      ]),
       paragraph(
         "Una vez recibido y verificado el pago, te enviaremos un nuevo correo con la confirmación definitiva de tu reserva."
       ),
@@ -130,7 +135,11 @@ function buildPaymentConfirmationEmailHtml(
       sectionTitle("Código de reserva:"),
       `<p style="margin:0 0 20px;color:#17345c;font-size:20px;font-weight:700;letter-spacing:0.04em;">${escapeHtml(reservationCode)}</p>`,
       sectionTitle("Información del encuentro:"),
-      list(["Inicio: 18:00 hs.", "Duración aproximada: 2 horas y 30 minutos."]),
+      list([
+        `Fecha: ${NEXT_EVENT_DATE_LABEL}.`,
+        "Inicio: 18:00 hs.",
+        "Duración aproximada: 2 horas y 30 minutos."
+      ]),
       sectionTitle("Información importante:"),
       paragraph(
         "Se recomienda asistir con una vestimenta acorde al carácter de la velada."
@@ -164,6 +173,7 @@ WhatsApp:
 +54 9 221 501 0965
 
 Información del encuentro:
+- Fecha: ${NEXT_EVENT_DATE_LABEL}.
 - Inicio: 18:00 hs.
 - Duración aproximada: 2 horas y 30 minutos.
 
@@ -195,6 +205,7 @@ Código de reserva:
 ${reservationCode}
 
 Información del encuentro:
+- Fecha: ${NEXT_EVENT_DATE_LABEL}.
 - Inicio: 18:00 hs.
 - Duración aproximada: 2 horas y 30 minutos.
 
@@ -277,7 +288,9 @@ function buildAdminEmailText(reservation: ReservationEmailPayload) {
   ].join("\n");
 }
 
-function buildAdminPaymentApprovedEmailText(reservation: ReservationEmailPayload) {
+function buildAdminPaymentApprovedEmailText(
+  reservation: ReservationEmailPayload
+) {
   const reservationCode = reservation.publicCode ?? reservation.id;
 
   return [
@@ -293,7 +306,7 @@ function buildAdminPaymentApprovedEmailText(reservation: ReservationEmailPayload
     "",
     "Datos del pago",
     "",
-    "Fecha de la tertulia: No especificada",
+    `Fecha de la tertulia: ${NEXT_EVENT_DATE_LABEL}`,
     "Importe pagado: No especificado",
     `ID de reserva: ${reservationCode}`,
     "ID de pago: No disponible",
@@ -319,7 +332,7 @@ function buildAdminPaymentApprovedEmailHtml(
       ]),
       sectionTitle("Datos del pago"),
       list([
-        "Fecha de la tertulia: No especificada",
+        `Fecha de la tertulia: ${NEXT_EVENT_DATE_LABEL}`,
         "Importe pagado: No especificado",
         `ID de reserva: ${reservationCode}`,
         "ID de pago: No disponible",
