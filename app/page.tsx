@@ -44,7 +44,7 @@ const socialLinks = {
   instagram: "https://www.instagram.com/tertulias_criollas_hemmingsen?igsh=MW0wY2Zqd3Bic2J2YQ==",
   youtube: "https://www.youtube.com/@hemmingsenart11",
   whatsapp: WHATSAPP_URL,
-  email: "mailto:contacto@tertuliascriollas.com"
+  email: "contacto@tertuliascriollas.com"
 };
 
 const contactLinks = [
@@ -71,14 +71,6 @@ const contactLinks = [
     buttonLabel: "Consultar",
     href: socialLinks.whatsapp,
     external: true
-  },
-  {
-    label: "Email",
-    icon: "@",
-    description: "Contacto institucional y solicitudes especiales.",
-    buttonLabel: "Escribir email",
-    href: socialLinks.email,
-    external: false
   }
 ] as const;
 
@@ -120,7 +112,7 @@ export default function HomePage() {
             <div className="mt-5 flex flex-col items-center justify-center gap-2 text-sm leading-7 text-stone-300 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:text-base">
               <span>Últimos sábados de cada mes</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
-              <span>Próxima fecha: sábado 25 de julio</span>
+              <span>Próxima fecha: sábado 29 de agosto</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
               <span>Inicio: 18:00 hs</span>
               <span className="hidden text-[#e5d2a3]/45 sm:inline">·</span>
@@ -190,10 +182,9 @@ export default function HomePage() {
                           "/galeria/arte/arte6.jpg"
                         ]
                         : [
-                          "/galeria/gastronomia/gastronomia1.jpg",
-                          "/galeria/gastronomia/gastronomia2.png",
-                          "/galeria/gastronomia/gastronomia3.jpg",
-                          "/galeria/gastronomia/gastronomia4.jpg"
+                          "/galeria/gastronomia/placeholder-1.svg",
+                          "/galeria/gastronomia/placeholder-2.svg",
+                          "/galeria/gastronomia/placeholder-3.svg"
                         ]
                     }
                   />

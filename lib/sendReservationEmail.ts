@@ -6,7 +6,7 @@ const LOGO_URL = "https://www.tertuliascriollas.com/logo.svg";
 const FOOTER_EMAIL = "contacto@tertuliascriollas.com";
 const WEBSITE_URL = "https://tertuliascriollas.com";
 const WEBSITE_LABEL = "tertuliascriollas.com";
-const NEXT_EVENT_DATE_LABEL = "sábado 25 de julio";
+const NEXT_EVENT_DATE_LABEL = "sábado 29 de agosto";
 
 export type ReservationEmailPayload = {
   id: string;

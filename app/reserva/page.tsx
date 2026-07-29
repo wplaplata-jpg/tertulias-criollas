@@ -218,7 +218,7 @@ export default function ReservationPage() {
               Próxima velada
             </p>
             <p className="mt-4 text-sm leading-7 text-stone-300 sm:text-base">
-              Sábado 25 de julio · 18:00 hs
+              Sábado 29 de agosto · 18:00 hs
             </p>
             <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500 sm:text-sm">
               Duración aproximada: 2 h 30 min
