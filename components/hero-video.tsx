@@ -30,11 +30,14 @@ export function HeroVideo() {
       return;
     }
 
+    video.volume = 1;
     setHeroMuted(false);
 
     video.play().catch(() => {
       setHeroMuted(true);
-      void video.play();
+      video.play().catch(() => {
+        // The hero remains visible even if the browser also blocks muted autoplay.
+      });
     });
   }, []);
 
@@ -83,6 +86,8 @@ export function HeroVideo() {
     setHeroMuted(!shouldUnmute);
 
     if (shouldUnmute) {
+      video.volume = 1;
+
       await video.play().catch(() => {
         setHeroMuted(true);
       });
@@ -96,7 +101,6 @@ export function HeroVideo() {
         autoPlay
         className="absolute inset-0 h-full w-full object-cover object-[52%_44%] min-[420px]:object-[50%_45%] sm:object-[50%_47%] md:object-[50%_45%] xl:object-center"
         loop
-        muted={isMuted}
         playsInline
       >
         <source src="/video.mp4" type="video/mp4" />
@@ -117,9 +121,9 @@ export function HeroVideo() {
         aria-pressed={!isMuted}
         onClick={toggleSound}
         title={isMuted ? "Activar sonido" : "Silenciar"}
-        className="absolute bottom-4 right-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/45 text-stone-100 shadow-[0_14px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/35 hover:bg-black/65 min-[420px]:bottom-5 min-[420px]:right-4 min-[420px]:h-11 min-[420px]:w-11 sm:bottom-8 sm:right-8 sm:h-12 sm:w-12 lg:bottom-10 lg:right-10"
+        className="absolute bottom-4 right-3 z-20 flex min-h-10 max-w-[calc(50vw-1rem)] items-center justify-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-2 font-[var(--font-heading)] text-[9px] font-semibold uppercase leading-tight tracking-[0.1em] text-stone-100 shadow-[0_14px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/35 hover:bg-black/65 min-[380px]:text-[10px] min-[420px]:bottom-5 min-[420px]:right-4 min-[420px]:min-h-11 min-[420px]:gap-2 min-[420px]:px-3.5 min-[420px]:text-[11px] min-[420px]:tracking-[0.12em] sm:bottom-8 sm:right-8 sm:min-h-12 sm:px-4 sm:py-2.5 sm:text-xs lg:bottom-10 lg:right-10"
       >
-        <span className="relative flex h-5 w-5 items-center justify-center sm:h-6 sm:w-6">
+        <span className="relative flex h-4 w-4 shrink-0 items-center justify-center min-[420px]:h-5 min-[420px]:w-5 sm:h-6 sm:w-6">
           <svg
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -154,6 +158,7 @@ export function HeroVideo() {
             <span className="absolute h-[1.35px] w-7 rotate-45 rounded-full bg-stone-100" />
           ) : null}
         </span>
+        <span>{isMuted ? "Activar sonido" : "Silenciar"}</span>
       </button>
     </>
   );
