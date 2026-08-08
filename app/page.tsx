@@ -44,13 +44,63 @@ const socialLinks = {
   instagram: "https://www.instagram.com/tertulias_criollas_hemmingsen?igsh=MW0wY2Zqd3Bic2J2YQ==",
   youtube: "https://www.youtube.com/@hemmingsenart11",
   whatsapp: WHATSAPP_URL,
-  email: "contacto@tertuliascriollas.com"
+  email: "mailto:contacto@tertuliascriollas.com"
 };
+
+type ContactIconType = "instagram" | "youtube" | "whatsapp" | "email";
+
+function ContactIcon({ type }: { type: ContactIconType }) {
+  const commonProps = {
+    "aria-hidden": true,
+    className: "h-8 w-8 sm:h-9 sm:w-9",
+    fill: "none",
+    stroke: "currentColor",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    viewBox: "0 0 24 24"
+  };
+
+  if (type === "instagram") {
+    return (
+      <svg {...commonProps}>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5" strokeWidth="1.4" />
+        <circle cx="12" cy="12" r="4" strokeWidth="1.4" />
+        <circle cx="17.4" cy="6.7" r="0.8" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
+  if (type === "youtube") {
+    return (
+      <svg {...commonProps}>
+        <rect x="2.75" y="5.5" width="18.5" height="13" rx="4" strokeWidth="1.4" />
+        <path d="m10 9 5 3-5 3V9Z" strokeWidth="1.4" />
+      </svg>
+    );
+  }
+
+  if (type === "whatsapp") {
+    return (
+      <svg {...commonProps}>
+        <circle cx="12" cy="11.5" r="8" strokeWidth="1.4" />
+        <path d="m6.25 17.2-1.1 3.15 3.25-.95" strokeWidth="1.4" />
+        <path d="M8.7 7.8c.3-.3.7-.2.9.1l.9 1.8c.15.3.1.6-.1.85l-.65.7a7.1 7.1 0 0 0 3.05 3.05l.7-.65c.25-.2.55-.25.85-.1l1.8.9c.35.2.4.65.15.9-.7.8-1.75 1.15-2.8.9a8.2 8.2 0 0 1-5.75-5.75c-.25-1 .1-2.05.95-2.7Z" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...commonProps}>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" strokeWidth="1.4" />
+      <path d="m4.5 7 7.5 6 7.5-6" strokeWidth="1.4" />
+    </svg>
+  );
+}
 
 const contactLinks = [
   {
     label: "Instagram",
-    icon: "IG",
+    icon: "instagram",
     description: "Novedades, registros visuales y próximas fechas.",
     buttonLabel: "Ver Instagram",
     href: socialLinks.instagram,
@@ -58,7 +108,7 @@ const contactLinks = [
   },
   {
     label: "YouTube",
-    icon: "YT",
+    icon: "youtube",
     description: "Conocé más sobre nuestros artistas y experiencias.",
     buttonLabel: "Ver canal",
     href: socialLinks.youtube,
@@ -66,11 +116,19 @@ const contactLinks = [
   },
   {
     label: "WhatsApp",
-    icon: "WA",
+    icon: "whatsapp",
     description: "Consultas directas sobre cupos y disponibilidad.",
     buttonLabel: "Consultar",
     href: socialLinks.whatsapp,
     external: true
+  },
+  {
+    label: "Email",
+    icon: "email",
+    description: "Contacto institucional y solicitudes especiales.",
+    buttonLabel: "Escribir email",
+    href: socialLinks.email,
+    external: false
   }
 ] as const;
 
@@ -248,30 +306,21 @@ export default function HomePage() {
 
             <nav
               aria-label="Redes y contacto"
-              className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-4 text-center sm:mt-12 sm:gap-x-6"
+              className="mx-auto mt-10 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-10 text-center sm:mt-12 sm:grid-cols-4"
             >
-              {contactLinks.map((link, index) => (
-                <span
+              {contactLinks.map((link) => (
+                <a
                   key={link.label}
-                  className="inline-flex items-center gap-x-4 sm:gap-x-6"
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noreferrer" : undefined}
+                  className="group inline-flex flex-col items-center gap-3 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.22em] text-stone-300 transition duration-300 hover:text-[#ead8ad] sm:text-base"
                 >
-                  <a
-                    href={link.href}
-                    target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noreferrer" : undefined}
-                    className="group inline-flex items-center gap-2 font-[var(--font-heading)] text-sm font-semibold uppercase tracking-[0.22em] text-stone-300 transition duration-300 hover:text-[#ead8ad] sm:text-base"
-                  >
-                    <span className="text-xs text-[#d8c39a]/80 transition duration-300 group-hover:text-[#ead8ad]">
-                      {link.icon}
-                    </span>
-                    <span>{link.label}</span>
-                  </a>
-                  {index < contactLinks.length - 1 ? (
-                    <span aria-hidden="true" className="text-[#d8c39a]/35">
-                      ·
-                    </span>
-                  ) : null}
-                </span>
+                  <span className="text-[#d8c39a]/80 transition duration-300 group-hover:text-[#ead8ad]">
+                    <ContactIcon type={link.icon} />
+                  </span>
+                  <span>{link.label}</span>
+                </a>
               ))}
             </nav>
           </div>
@@ -285,9 +334,12 @@ export default function HomePage() {
             <p className="mt-2 text-xs uppercase tracking-[0.24em] text-stone-500">
               Música · Arte · Gastronomía
             </p>
-            <p className="mt-4 text-sm text-stone-500">
-              www.tertuliascriollas.com
-            </p>
+            <a
+              href="mailto:contacto@tertuliascriollas.com"
+              className="mt-4 inline-block text-sm text-stone-500 transition duration-300 hover:text-[#ead8ad]"
+            >
+              contacto@tertuliascriollas.com
+            </a>
           </div>
         </footer>
       </main>
